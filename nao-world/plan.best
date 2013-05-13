@@ -1,0 +1,6 @@
+0.00000000: (kick bot ball-04 pos-01-01 pos-02-01 pos-03-01 dir-south) [1.00000000]
+1.00200000: (move bot pos-01-01 pos-02-01 dir-south) [1.00000000]
+2.00400000: (move bot pos-02-01 pos-03-02 dir-southeast) [1.00000000]
+3.00600000: (pick-up bot box-04 pos-03-02 pos-04-03 dir-southeast) [3.00000000]
+6.00800000: (move bot pos-03-02 pos-04-03 dir-southeast) [1.00000000]
+7.01000000: (move bot pos-04-03 pos-04-04 dir-east) [1.00000000]

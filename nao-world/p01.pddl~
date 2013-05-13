@@ -16,8 +16,6 @@
 		box-04 - box
 		ball-01 - ball
 		ball-02 - ball
-		ball-03 - ball
-		ball-04 - ball
 		pos-01-01 - location
 		pos-01-02 - location
 		pos-01-03 - location
@@ -44,9 +42,9 @@
 		(at box-04 pos-04-03)
 		(at ball-01 pos-01-03)
 		(at ball-02 pos-03-03)
-		(at ball-03 pos-01-02)
-		(at ball-04 pos-02-01)
+		(clear pos-01-02)
 		(clear pos-01-04)
+		(clear pos-02-01)
 		(clear pos-02-03)
 		(clear pos-02-04)
 		(clear pos-03-01)
