@@ -1,0 +1,9 @@
+state_creators:
+    - nao_actions/state_creator_robot_pose robot_location location at-base location
+goal_creators:
+    - nao_actions/goal_creator_tidyup_objects
+action_executors:
+    - nao_actions/action_executor_pickup_object pickup-object /tidyup/grasping_action
+    - nao_actions/action_executor_putdown_object putdown-object /tidyup/placing_action
+    - nao_actions/action_executor_detect_objects detect-objects /tidyup/detect_objects /tidyup/request_graspability table3_loc5
+    - planner_navigation_actions/action_executor_ros_navigation drive-base move_base start recent-detected-objects false

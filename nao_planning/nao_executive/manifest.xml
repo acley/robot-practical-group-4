@@ -1,0 +1,14 @@
+<package>
+  <description brief="nao_executive">
+
+     nao_executive
+
+  </description>
+  <author>dornhege</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nao_executive</url>
+
+</package>
+
+
