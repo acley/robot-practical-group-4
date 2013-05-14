@@ -1,0 +1,14 @@
+<library path="lib/libnao_actions">
+    <class name="nao_actions/action_executor_pickup_object" type="nao_actions::ActionExecutorPickupObject"
+        base_class_type="continual_planning_executive::ActionExecutorInterface">
+        <description>Action executor for picking up objects</description>
+    </class>
+
+    <class name="nao_actions/goal_creator_tidyup_objects" type="nao_actions::GoalCreatorTidyupObjects" base_class_type="continual_planning_executive::GoalCreator">
+        <description>Loads manipulation locations from a config file for static objects and doors and assigns them to their respective rooms.</description>
+    </class>
+
+    <class name="nao_actions/state_creator_robot_pose" type="nao_actions::StateCreatorRobotPose" base_class_type="continual_planning_executive::StateCreator">
+        <description>Sets the current robot pose in the state and possible at-style predicates.</description>
+    </class>
+</library>

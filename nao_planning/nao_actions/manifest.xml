@@ -1,0 +1,24 @@
+<package>
+  <description brief="nao_actions">
+
+     nao_actions
+
+  </description>
+  <author>dornhege</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nao_actions</url>
+  <depend package="continual_planning_executive"/>
+  <depend package="pluginlib"/>
+  <depend package="roscpp"/>
+  <depend package="tf"/>
+  <depend package="tidyup_msgs"/>
+  <depend package="visualization_msgs"/>
+
+  <export>
+      <continual_planning_executive plugin="${prefix}/nao_actions_plugins.xml" />
+  </export>
+
+</package>
+
+

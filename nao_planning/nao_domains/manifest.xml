@@ -1,0 +1,14 @@
+<package>
+  <description brief="nao_domains">
+
+     nao_domains
+
+  </description>
+  <author>dornhege</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nao_domains</url>
+
+</package>
+
+
