@@ -16,7 +16,7 @@
 		           (at start (clear ?to))
 		           (over all (MOVE-DIR ?from ?to ?dir))
 		           )
-	   :effect    (and (at start (not (at ?p ?from)))
+	   :effect    (and (at start (not (at ?r ?from)))
 		           (at start (not (clear ?to)))
 		           (at end (at ?r ?to))
 		           (at end (clear ?from))

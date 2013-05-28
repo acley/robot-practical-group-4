@@ -247,170 +247,52 @@ namespace nao_actions
             return true;*/
         }
 
-        bool StateCreatorRobotPose::extractPoseStamped(const SymbolicState & state, const string & object,
-                geometry_msgs::PoseStamped & pose) const
-        {
-            	Predicate p;
-		p.name= "at";
-		p.parameters.push_back(object);
-		bool val;
-		if(!state.hasBooleanPredicate(p, &val)){
-			ROS_ERROR("Could not extract pose for object %s: ", object.c_str());
-			return false;
-		}
-		else{
-
-			if(val){
-
-				istringstream iss(object);
-				string position;
-				iss >> position;
-				iss >> position;
-				position= position.substr(4);
-				int index= position.find('-');
-				//use split and istring stream to get the x and y positions from object
-				pose.pose.position.x= atoi(position.substr(0,index))*cell_size;
-				pose.pose.position.y= atoi(position.substr(index+1))*cell_size;
-				return true;
-			}
-			else 
-				return false;
-		}
-/*
-	    bool ret = true;
-
-            // first get xyz, qxyzw from state
-            Predicate p;
-            p.parameters.push_back(object);
-
-            double posX = 0;
-            p.name = "x";
-            if(!state.hasNumericalFluent(p, &posX)) {
-                ROS_ERROR("%s: object: %s - no x-location in state.", __func__, object.c_str());
-                ret = false;;
-            }
-            double posY = 0;
-            p.name = "y";
-            if(!state.hasNumericalFluent(p, &posY)) {
-                ROS_ERROR("%s: object: %s - no y-location in state.", __func__, object.c_str());
-                ret = false;;
-            }
-            double posZ = 0;
-            p.name = "z";
-            if(!state.hasNumericalFluent(p, &posZ)) {
-                ROS_ERROR("%s: object: %s - no z-location in state.", __func__, object.c_str());
-                ret = false;;
-            }
-
-            double qx;
-            p.name = "qx";
-            if(!state.hasNumericalFluent(p, &qx)) {
-                ROS_ERROR("%s: object: %s - no qx in state.", __func__, object.c_str());
-                ret = false;;
-            }
-            double qy;
-            p.name = "qy";
-            if(!state.hasNumericalFluent(p, &qy)) {
-                ROS_ERROR("%s: object: %s - no qy in state.", __func__, object.c_str());
-                ret = false;;
-            }
-            double qz;
-            p.name = "qz";
-            if(!state.hasNumericalFluent(p, &qz)) {
-                ROS_ERROR("%s: object: %s - no qz in state.", __func__, object.c_str());
-                ret = false;;
-            }
-            double qw;
-            p.name = "qw";
-            if(!state.hasNumericalFluent(p, &qw)) {
-                ROS_ERROR("%s: object: %s - no qw in state.", __func__, object.c_str());
-                ret = false;;
-            }
-
-            double timestamp;
-            p.name = "timestamp";
-            if(!state.hasNumericalFluent(p, &timestamp)) {
-                ROS_ERROR("%s: object: %s - no timestamp in state.", __func__, object.c_str());
-                ret = false;;
-            }
-
-            string frameid;
-            p.name = "frame-id";
-            if(!state.hasObjectFluent(p, &frameid)) {
-                ROS_ERROR("%s: object: %s - no frameid in state.", __func__, object.c_str());
-                ret = false;;
-            }
-
-            pose.header.frame_id = frameid;
-            pose.header.stamp = ros::Time(timestamp);
-            pose.pose.position.x = posX;
-            pose.pose.position.y = posY;
-            pose.pose.position.z = posZ;
-            pose.pose.orientation.x = qx;
-            pose.pose.orientation.y = qy;
-            pose.pose.orientation.z = qz;
-            pose.pose.orientation.w = qw;
-
-            return ret; */
-        }
-
-        visualization_msgs::MarkerArray StateCreatorRobotPose::getLocationMarkers(const SymbolicState & state,
-                const string & location, const string & ns, int id, bool useMeshes) const
-        {
-            visualization_msgs::MarkerArray ma;
-
-            geometry_msgs::PoseStamped locationPose;
-            if(!extractPoseStamped(state, location, locationPose)) {
-                ROS_ERROR("%s: could not extract pose for location object: %s.", __func__, location.c_str());
-                return ma; 
-            }
-            if(locationPose.header.frame_id != "/map") {
-                ROS_ERROR("Location pose %s had frame-id: %s - should be /map.",
-                        location.c_str(), locationPose.header.frame_id.c_str());
-                return ma;
-            }
-
-            if(useMeshes) {
-                locationPose.pose.position.z = 0;
-                // zero out z to account for different frame (/base_link vs. /base_footprint)
-
-                return ma;
-            }
-
-            visualization_msgs::Marker mark;
-            mark.header.frame_id = "/map";
-            mark.ns = ns; 
-            mark.id = id;
-            mark.type = visualization_msgs::Marker::ARROW;
-            mark.action = visualization_msgs::Marker::ADD;
-            mark.pose = locationPose.pose;
-            mark.pose.position.z += 0.15;
-            mark.scale.x = 1.0;     // radius / 10?
-            mark.scale.y = 1.0;
-            mark.scale.z = 0.12;     // arrow length
-            mark.text = location;
-
-        ma.markers.push_back(mark);
-
-        mark.type = visualization_msgs::Marker::SPHERE;
-        mark.scale.x = 0.2;
-        mark.scale.y = 0.2;
-        mark.scale.z = 0.2;
-        mark.id++;
-
-        ma.markers.push_back(mark);
-        
-        return ma;
-    }
-
+	
+       
     /**
-     * Publish markers for locations:
-     * target locations are yellow or green if the robot is at the location
-     * the robot location is white or blue if the robot is at the location
+     * Publishes locations for boxes, balls and the robot
      */
     void StateCreatorRobotPose::publishLocationsAsMarkers(const SymbolicState & state)
     {
-	//What does this do exactly??
+	ros::NodeHandle node;
+	ros::ServiceClient client = node.serviceClient<nao_msgs::RobotLocation>("RobotLocation");
+	nao_msgs::RobotLocation srv;
+	visualization_msgs::MarkerArray ma;
+	if(client.call(srv)){
+		visualization_msgs::Marker robLoc;
+		robLoc.ns= "robot";
+		robLoc.id= 0;
+		robLoc.pose= srv.response.robotLocation.pose;
+		robLoc.header= srv.response.robotLocation.header;
+		robLoc.type= visualization_msgs::Marker::ARROW;
+		robLoc.action= visualization_msgs::Marker::ADD;
+		ma.markers.push_back(robLoc);
+	}
+	else{
+		ROS_ERROR("Cannot extract current robot location");
+		return;
+	}
+
+	//call to service to get the current positions of the balls and boxes
+	ros::ServiceClient objClient= node.serviceClient<nao_msgs::ObjectLocations>("ObjectLocations");
+	nao_msgs::ObjectLocations srv;
+	if(objClient.call(srv)){
+		visualization_msgs::MarkerArray boxLocs= srv.response.boxLocs;
+		visualization_msgs::MarkerArray ballLocs= srv.response.ballLocs;
+		for(int i=0; i<boxLocs.markers.size(); i++){
+			ma.markers.push_back(boxLocs.markers[i]);
+		}
+		for(int i=0; i<ballLocs.markers.size(); i++){
+			ma.markers.push_back(ballLocs.markers[i]);
+		}
+
+	}
+	else{
+		ROS_ERROR("Cannot extract object locations");
+		return;
+	}
+
+	_markerPub.publish(ma);
         /*if(!_markerPub) {
             ROS_WARN("%s: _markerPub invalid.", __func__);
             return;

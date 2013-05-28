@@ -127,8 +127,11 @@ namespace nao_actions
 		goal.addObject(*it, "ball");
 	}
 
-	//check how the goal should be defined
-	//goal.setForEachGoalStatement("robot", "at", true);
+	//defining the goal condition
+	std::vector<std::string> goalPred;
+	goalPred.push_back("robot");
+	goalPred.push_back(goalLoc);
+	goal.setBooleanPredicate("at", goalPred, true);
         
 	//setting the clear locations
 	for(int i= 1; i<=grid_size; i++)

@@ -39,19 +39,6 @@ namespace nao_actions
             virtual bool fillState(SymbolicState & state);
 
         protected:
-            /// Extract a PoseStamped for object from state.
-            /**
-             * The fluents that are queried are: x,y,z, qx,qy,qz,qw, frame-id, timestamp
-             *
-             * \returns true if all fluents were available
-             */
-            bool extractPoseStamped(const SymbolicState & state, const string & object,
-                    geometry_msgs::PoseStamped & pose) const;
-
-            /// Create a marker for location.
-            visualization_msgs::MarkerArray getLocationMarkers(const SymbolicState & state, const string & location,
-                    const string & ns, int id, bool useMeshes) const;
-
             void publishLocationsAsMarkers(const SymbolicState & state);
 
         protected:
