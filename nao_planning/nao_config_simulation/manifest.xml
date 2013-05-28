@@ -1,0 +1,14 @@
+<package>
+  <description brief="nao_config_simulation">
+
+     nao_config_simulation
+
+  </description>
+  <author>dornhege</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nao_config_simulation</url>
+
+</package>
+
+
