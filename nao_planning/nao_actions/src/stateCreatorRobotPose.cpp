@@ -2,6 +2,10 @@
 #include <pluginlib/class_list_macros.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <angles/angles.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <visualization_msgs/MarkerArray.h>
+#include <stringstream>
+
 
 PLUGINLIB_DECLARE_CLASS(nao_actions, state_creator_robot_pose,
         nao_actions::StateCreatorRobotPose, continual_planning_executive::StateCreator)
@@ -13,11 +17,19 @@ namespace nao_actions
     {
         ros::NodeHandle nhPriv("~");
         ros::NodeHandle nh;
-        nhPriv.param("nav_target_tolerance_xy", _goalToleranceXY, 0.5);
-        nhPriv.param("nav_target_tolerance_yaw", _goalToleranceYaw, 0.26);  //15deg
+	nhPriv.getParam("cell_size", cell_size);
+	nhPriv.getParam("grid_size", grid_size);
+	nhPriv.getParam("robotLoc", robotLoc);
+	nhPriv.getParam("goalLoc", goalLoc);
+	nhPriv.getParam("boxLocs", boxLocs);
+	nhPriv.getParam("ballLocs", ballLocs);
+	nhPriv.getParam("boxes", boxes);
+	nhPriv.getParam("balls", balls);
+        //nhPriv.param("nav_target_tolerance_xy", _goalToleranceXY, 0.5);
+        //nhPriv.param("nav_target_tolerance_yaw", _goalToleranceYaw, 0.26);  //15deg
 
-        bool relative;
-        nhPriv.param("nav_target_tolerance_relative_to_move_base", relative, false);
+        //bool relative;
+      /*  nhPriv.param("nav_target_tolerance_relative_to_move_base", relative, false);
         if(relative) {
             // relative mode: 1. get the namespace for base_local_planner
             std::string base_local_planner_ns;
@@ -61,7 +73,7 @@ namespace nao_actions
 
             ROS_INFO("Tolerance for accepting nav goals set to %f m, %f deg.",
                     _goalToleranceXY, angles::to_degrees(_goalToleranceYaw));
-
+	*/
             if(s_PublishLocationsAsMarkers) {
                 _markerPub = nhPriv.advertise<visualization_msgs::MarkerArray>("robot_pose_markers", 5, true);
                 ROS_INFO("marker topic: %s", _markerPub.getTopic().c_str());
@@ -72,28 +84,75 @@ namespace nao_actions
         {
         }
 
-        void StateCreatorRobotPose::initialize(const std::deque<std::string> & arguments)
+        void StateCreatorRobotPose::initialize()
         {
-            ROS_ASSERT(arguments.size() == 4);
-
-            _robotPoseObject = arguments[0];
-            _robotPoseType = arguments[1];
-            _atPredicate = arguments[2];
-            _locationType = arguments[3];
-
-            if(_robotPoseObject == "-")
-                _robotPoseObject = "";
-            if(_robotPoseType == "-")
-                _robotPoseType = "";
-            if(_atPredicate == "-")
-                _atPredicate = "";
-            if(_locationType == "-")
-                _locationType = "";
+            
 
         }
 
+	//sets the current location for the robot and the observed objects
         bool StateCreatorRobotPose::fillState(SymbolicState & state)
         {
+		geometry_msgs::PoseStamped robotPose;
+		//call to service to get the current robot location
+		//PS fix the include statements!!!
+		ros::NodeHandle node;
+		ros::ServiceClient client = node.serviceClient<nao_msgs::RobotLocation>("RobotLocation");
+		nao_msgs::RobotLocation srv;
+		int robotLocX, robotLocY;
+		if(client.call(srv)){
+			robotPose= srv.response.robotLocation;
+			robotLocX= robotPose.pose.position.x/cell_size;
+			robotLocY= robotPose.pose.position.y/cell_size;
+			stringstream ss;
+			ss << "pos-" << robotLocX << "-" << robotLocY;
+			robotLoc= ss.str();
+			std::vector<std::string> atPredicate;
+			atPredicate.push_back("robot");
+			atPredicate.push_back(robotLoc);
+			//setting the current robot location
+			state.setBooleanPredicate("at", atPredicate, true);
+		}
+		else{
+			ROS_ERROR("Cannot extract current robot location");
+			return false;
+		}
+
+		//call to service to get the current positions of the balls and boxes
+		ros::ServiceClient objClient= node.serviceClient<nao_msgs::ObjectLocations>("ObjectLocations");
+		nao_msgs::ObjectLocations srv;
+		if(objClient.call(srv)){
+			visualization_msgs::MarkerArray boxLocs= srv.response.boxLocs;
+			visualization_msgs::MarkerArray ballLocs= srv.response.ballLocs;
+			for(int i=0; i<boxLocs.markers.size(); i++){
+				stringstream ss;
+				ss << "pos-" << boxLocs.markers[i].pose.position.x/cell_size << "-" << boxLocs.markers[i].pose.position.y/cell_size;
+				std::vector<std::string> atPredicate;
+				atPredicate.push_back(boxLocs.markers[i].ns);
+				atPredicate.push_back(ss.str());
+				state.setBooleanPredicate("at", atPredicate, true);
+			}
+			for(int i=0; i<ballLocs.markers.size(); i++){
+				stringstream ss;
+				ss << "pos-" << ballLocs.markers[i].pose.position.x/cell_size << "-" << ballLocs.markers[i].pose.position.y/cell_size;
+				std::vector<std::string> atPredicate;
+				atPredicate.push_back(ballLocs.markers[i].ns);
+				atPredicate.push_back(ss.str());
+				state.setBooleanPredicate("at", atPredicate, true);
+			}
+
+		}
+		else{
+			ROS_ERROR("Cannot extract object locations");
+			return false;
+		}
+
+		if(s_PublishLocationsAsMarkers)
+               		publishLocationsAsMarkers(state);
+		return true;
+
+/*
+
             tf::StampedTransform transform;
             try{
                 _tf.lookupTransform("/map", "/base_link", ros::Time(0), transform);
@@ -185,13 +244,40 @@ namespace nao_actions
             if(s_PublishLocationsAsMarkers)
                 publishLocationsAsMarkers(state);
 
-            return true;
+            return true;*/
         }
 
         bool StateCreatorRobotPose::extractPoseStamped(const SymbolicState & state, const string & object,
                 geometry_msgs::PoseStamped & pose) const
         {
-            bool ret = true;
+            	Predicate p;
+		p.name= "at";
+		p.parameters.push_back(object);
+		bool val;
+		if(!state.hasBooleanPredicate(p, &val)){
+			ROS_ERROR("Could not extract pose for object %s: ", object.c_str());
+			return false;
+		}
+		else{
+
+			if(val){
+
+				istringstream iss(object);
+				string position;
+				iss >> position;
+				iss >> position;
+				position= position.substr(4);
+				int index= position.find('-');
+				//use split and istring stream to get the x and y positions from object
+				pose.pose.position.x= atoi(position.substr(0,index))*cell_size;
+				pose.pose.position.y= atoi(position.substr(index+1))*cell_size;
+				return true;
+			}
+			else 
+				return false;
+		}
+/*
+	    bool ret = true;
 
             // first get xyz, qxyzw from state
             Predicate p;
@@ -265,7 +351,7 @@ namespace nao_actions
             pose.pose.orientation.z = qz;
             pose.pose.orientation.w = qw;
 
-            return ret;
+            return ret; */
         }
 
         visualization_msgs::MarkerArray StateCreatorRobotPose::getLocationMarkers(const SymbolicState & state,
@@ -324,7 +410,8 @@ namespace nao_actions
      */
     void StateCreatorRobotPose::publishLocationsAsMarkers(const SymbolicState & state)
     {
-        if(!_markerPub) {
+	//What does this do exactly??
+        /*if(!_markerPub) {
             ROS_WARN("%s: _markerPub invalid.", __func__);
             return;
         }
@@ -394,7 +481,7 @@ namespace nao_actions
             }
         }
 
-        _markerPub.publish(ma);
+        _markerPub.publish(ma);*/
     }
 
 };

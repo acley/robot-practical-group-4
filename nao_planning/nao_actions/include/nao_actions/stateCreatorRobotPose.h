@@ -10,6 +10,7 @@
 namespace nao_actions 
 {
 
+
     /// This state creator adds the current robot pose to the state.
     /**
      * The current pose is estimated via tf as the transform from /map to /base_link.
@@ -32,13 +33,8 @@ namespace nao_actions
             StateCreatorRobotPose();
             ~StateCreatorRobotPose();
 
-            /// Initialize the state creator parameters.
-            /**
-             * robot_pose robot_pose_type at_predicate locations_type
-             *
-             * If any parameter is given as "-" (dash), it is assumed empty.
-             */
-            virtual void initialize(const std::deque<std::string> & arguments);
+            
+            virtual void initialize();
 
             virtual bool fillState(SymbolicState & state);
 
@@ -59,6 +55,11 @@ namespace nao_actions
             void publishLocationsAsMarkers(const SymbolicState & state);
 
         protected:
+	
+	    int cell_size, grid_size;
+	    std::string robotLoc, goalLoc;
+	    std::vector<std::string> boxLocs, ballLocs, boxes, balls;	    
+
             tf::TransformListener _tf;
 
             double _goalToleranceXY;

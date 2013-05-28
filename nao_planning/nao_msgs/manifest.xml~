@@ -1,0 +1,15 @@
+<package>
+  <description brief="nao_msgs">
+
+     nao_msgs
+
+  </description>
+  <author>Noha</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nao_msgs</url>
+  <depend package="geometry_msgs"/>
+
+</package>
+
+

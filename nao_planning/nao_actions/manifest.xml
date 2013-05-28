@@ -14,6 +14,7 @@
   <depend package="tf"/>
   <depend package="tidyup_msgs"/>
   <depend package="visualization_msgs"/>
+  <depend package="geometry_msgs"/>
 
   <export>
       <continual_planning_executive plugin="${prefix}/nao_actions_plugins.xml" />
