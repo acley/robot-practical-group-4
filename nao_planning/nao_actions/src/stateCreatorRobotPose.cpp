@@ -4,7 +4,11 @@
 #include <angles/angles.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <visualization_msgs/MarkerArray.h>
-#include <stringstream>
+#include <sstream>
+#include <XmlRpcValue.h>
+#include <XmlRpcException.h>
+#include <nao_msgs/ObjectLocations.h>
+#include <nao_msgs/RobotLocation.h>
 
 
 PLUGINLIB_DECLARE_CLASS(nao_actions, state_creator_robot_pose,
@@ -21,10 +25,26 @@ namespace nao_actions
 	nhPriv.getParam("grid_size", grid_size);
 	nhPriv.getParam("robotLoc", robotLoc);
 	nhPriv.getParam("goalLoc", goalLoc);
-	nhPriv.getParam("boxLocs", boxLocs);
-	nhPriv.getParam("ballLocs", ballLocs);
-	nhPriv.getParam("boxes", boxes);
-	nhPriv.getParam("balls", balls);
+	nhPriv.getParam("boxLocs", xmlboxLocs);
+	nhPriv.getParam("ballLocs", xmlballLocs);
+	nhPriv.getParam("boxes", xmlboxes);
+	nhPriv.getParam("balls", xmlballs);
+
+	ROS_ASSERT(xmlboxLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlballLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlboxes.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlballs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+	//copying xmlrpc to vector
+	for(int i=0; i<xmlboxLocs.size(); i++){
+		boxLocs.push_back(xmlboxLocs[i]);
+		boxes.push_back(xmlboxes[i]);
+	}
+	for(int i=0; i<xmlballLocs.size(); i++){
+		ballLocs.push_back(xmlballLocs[i]);
+		balls.push_back(xmlballs[i]);
+	}
+
         //nhPriv.param("nav_target_tolerance_xy", _goalToleranceXY, 0.5);
         //nhPriv.param("nav_target_tolerance_yaw", _goalToleranceYaw, 0.26);  //15deg
 
@@ -102,9 +122,9 @@ namespace nao_actions
 		int robotLocX, robotLocY;
 		if(client.call(srv)){
 			robotPose= srv.response.robotLocation;
-			robotLocX= robotPose.pose.position.x/cell_size;
-			robotLocY= robotPose.pose.position.y/cell_size;
-			stringstream ss;
+			robotLocX= robotPose.pose.position.x/cell_size+1;
+			robotLocY= robotPose.pose.position.y/cell_size+1;
+			std::stringstream ss;
 			ss << "pos-" << robotLocX << "-" << robotLocY;
 			robotLoc= ss.str();
 			std::vector<std::string> atPredicate;
@@ -112,6 +132,7 @@ namespace nao_actions
 			atPredicate.push_back(robotLoc);
 			//setting the current robot location
 			state.setBooleanPredicate("at", atPredicate, true);
+			state.setBooleanPredicate("clear", robotLoc, false);
 		}
 		else{
 			ROS_ERROR("Cannot extract current robot location");
@@ -120,25 +141,27 @@ namespace nao_actions
 
 		//call to service to get the current positions of the balls and boxes
 		ros::ServiceClient objClient= node.serviceClient<nao_msgs::ObjectLocations>("ObjectLocations");
-		nao_msgs::ObjectLocations srv;
-		if(objClient.call(srv)){
-			visualization_msgs::MarkerArray boxLocs= srv.response.boxLocs;
-			visualization_msgs::MarkerArray ballLocs= srv.response.ballLocs;
-			for(int i=0; i<boxLocs.markers.size(); i++){
-				stringstream ss;
-				ss << "pos-" << boxLocs.markers[i].pose.position.x/cell_size << "-" << boxLocs.markers[i].pose.position.y/cell_size;
+		nao_msgs::ObjectLocations srv1;
+		if(objClient.call(srv1)){
+			visualization_msgs::MarkerArray currBoxLocs= srv1.response.boxLocs;
+			visualization_msgs::MarkerArray currBallLocs= srv1.response.ballLocs;
+			for(int i=0; i<currBoxLocs.markers.size(); i++){
+				std::stringstream ss;
+				ss << "pos-" << currBoxLocs.markers[i].pose.position.x/cell_size+1 << "-" << currBoxLocs.markers[i].pose.position.y/cell_size+1;
 				std::vector<std::string> atPredicate;
-				atPredicate.push_back(boxLocs.markers[i].ns);
+				atPredicate.push_back(currBoxLocs.markers[i].ns);
 				atPredicate.push_back(ss.str());
 				state.setBooleanPredicate("at", atPredicate, true);
+				state.setBooleanPredicate("clear", ss.str(), false);
 			}
-			for(int i=0; i<ballLocs.markers.size(); i++){
-				stringstream ss;
-				ss << "pos-" << ballLocs.markers[i].pose.position.x/cell_size << "-" << ballLocs.markers[i].pose.position.y/cell_size;
+			for(int i=0; i<currBallLocs.markers.size(); i++){
+				std::stringstream ss;
+				ss << "pos-" << currBallLocs.markers[i].pose.position.x/cell_size+1 << "-" << currBallLocs.markers[i].pose.position.y/cell_size+1;
 				std::vector<std::string> atPredicate;
-				atPredicate.push_back(ballLocs.markers[i].ns);
+				atPredicate.push_back(currBallLocs.markers[i].ns);
 				atPredicate.push_back(ss.str());
 				state.setBooleanPredicate("at", atPredicate, true);
+				state.setBooleanPredicate("clear", ss.str(), false);
 			}
 
 		}
@@ -275,15 +298,15 @@ namespace nao_actions
 
 	//call to service to get the current positions of the balls and boxes
 	ros::ServiceClient objClient= node.serviceClient<nao_msgs::ObjectLocations>("ObjectLocations");
-	nao_msgs::ObjectLocations srv;
-	if(objClient.call(srv)){
-		visualization_msgs::MarkerArray boxLocs= srv.response.boxLocs;
-		visualization_msgs::MarkerArray ballLocs= srv.response.ballLocs;
-		for(int i=0; i<boxLocs.markers.size(); i++){
-			ma.markers.push_back(boxLocs.markers[i]);
+	nao_msgs::ObjectLocations srv1;
+	if(objClient.call(srv1)){
+		visualization_msgs::MarkerArray currBoxLocs= srv1.response.boxLocs;
+		visualization_msgs::MarkerArray currBallLocs= srv1.response.ballLocs;
+		for(int i=0; i<currBoxLocs.markers.size(); i++){
+			ma.markers.push_back(currBoxLocs.markers[i]);
 		}
-		for(int i=0; i<ballLocs.markers.size(); i++){
-			ma.markers.push_back(ballLocs.markers[i]);
+		for(int i=0; i<currBallLocs.markers.size(); i++){
+			ma.markers.push_back(currBallLocs.markers[i]);
 		}
 
 	}

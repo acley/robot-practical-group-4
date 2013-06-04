@@ -1,13 +1,15 @@
 #include "nao_actions/goalCreatorTidyupObjects.h"
 #include <pluginlib/class_list_macros.h>
-#include <ros/ros.h>
 #include <tf/transform_datatypes.h>
 #include <set>
 #include <std_srvs/Empty.h>
 #include <geometry_msgs/Pose2D.h>
 #include <geometry_msgs/Point.h>
-#include <stringstream>
+#include <XmlRpcValue.h>
+#include <XmlRpcException.h>
+#include <sstream>
 #include <iostream>
+#include <algorithm>
 
 
 PLUGINLIB_DECLARE_CLASS(nao_actions, goal_creator_tidyup_objects,
@@ -28,13 +30,7 @@ namespace nao_actions
     bool GoalCreatorTidyupObjects::fillStateAndGoal(SymbolicState & currentState, SymbolicState & goal)
     {
         ros::NodeHandle nhPriv("~");
-        /*if (! worldResetPerformed)
-        {
-        	worldResetPerformed = true;
-        	std_srvs::Empty msg;
-        	ros::service::call("/tidyup/reset_world_interface", msg);
-        }
-	*/
+        
         // first add the type hierarchy
 	currentState.addSuperType("direction", "object");
 	currentState.addSuperType("thing", "object");
@@ -54,66 +50,58 @@ namespace nao_actions
 	
 
 	
-        /*currentState.addSuperType("pose", "pose");
-        currentState.addSuperType("frameid", "frameid");
-        currentState.addSuperType("location", "pose");
-        currentState.addSuperType("manipulation_location", "location");
-        currentState.addSuperType("door_location", "location");
-        currentState.addSuperType("door_in_location", "door_location");
-        currentState.addSuperType("door_out_location", "door_location");
-        currentState.addSuperType("room", "room");
-        currentState.addSuperType("static_object", "static_object");
-        currentState.addSuperType("door", "door");
-        currentState.addSuperType("movable_object", "pose");
-        currentState.addSuperType("arm", "arm");
-        currentState.addSuperType("arm_state", "arm_state");
-        goal.addSuperType("pose", "pose");
-        goal.addSuperType("frameid", "frameid");
-        goal.addSuperType("location", "pose");
-        goal.addSuperType("manipulation_location", "location");
-        goal.addSuperType("door_location", "location");
-        goal.addSuperType("door_in_location", "door_location");
-        goal.addSuperType("door_out_location", "door_location");
-        goal.addSuperType("room", "room");
-        goal.addSuperType("static_object", "static_object");
-        goal.addSuperType("door", "door");
-        goal.addSuperType("movable_object", "pose");
-        goal.addSuperType("arm", "arm");
-        goal.addSuperType("arm_state", "arm_state");
-	*/
+        
         currentState.printSuperTypes();
 
-        // load grid size, cell size, initial robot location and goal location
-	// assume that the cells are 8 way connected
-	// cell size is in cms
-	int cell_size, grid_size;
-	std::string robotLoc, goalLoc;
-	std::vector<std::string> boxLocs, ballLocs, boxes, balls, connections, directions;
+        
 
 	nhPriv.getParam("cell_size", cell_size);
 	nhPriv.getParam("grid_size", grid_size);
 	nhPriv.getParam("robotLoc", robotLoc);
 	nhPriv.getParam("goalLoc", goalLoc);
-	nhPriv.getParam("boxLocs", boxLocs);
-	nhPriv.getParam("ballLocs", ballLocs);
-	nhPriv.getParam("boxes", boxes);
-	nhPriv.getParam("balls", balls);
-	nhPriv.getParam("connections", connections);
-	nhPriv.getParam("directions", directions);
+	nhPriv.getParam("boxLocs", xmlboxLocs);
+	nhPriv.getParam("ballLocs", xmlballLocs);
+	nhPriv.getParam("boxes", xmlboxes);
+	nhPriv.getParam("balls", xmlballs);
+	nhPriv.getParam("connections", xmlconnections);
+	nhPriv.getParam("directions", xmldirections);
+
+	ROS_ASSERT(xmlboxLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlballLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlboxes.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlballs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlconnections.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmldirections.getType() == XmlRpc::XmlRpcValue::TypeArray);
+
+	//copying xmlrpc data to vectors
+	for(int i=0; i<xmlboxLocs.size(); i++){
+		boxLocs.push_back(xmlboxLocs[i]);
+		boxes.push_back(xmlboxes[i]);
+	}
+	for(int i=0; i<xmlballLocs.size(); i++){
+		ballLocs.push_back(xmlballLocs[i]);
+		balls.push_back(xmlballs[i]);
+	}
+	for(int i=0; i<xmlconnections.size(); i++){
+		connections.push_back(xmlconnections[i]);
+	}
+	for(int i=0; i<xmldirections.size(); i++){
+		directions.push_back(xmldirections[i]);
+	}
 
 	//adding locations
 	for(int i=1; i<=grid_size; i++)
 		for(int j=1; j<=grid_size; j++){
-			stringstream pos;
+			std::stringstream pos;
 			pos << "pos-" << i << "-" << j;
 			currentState.addObject(pos.str(), "location");
 			goal.addObject(pos.str(), "location");
 		}
 
 	//adding the directions
-	for(std::vector<std::string>::iterator it= directions.begin(); it!=directions.end(); ++it){
-		currentState.addObject(*it, "direction");
-		goal.addObject(*it, "direction");
+	for(int it= 0; it<directions.size(); ++it){
+		currentState.addObject(directions[it], "direction");
+		goal.addObject(directions[it], "direction");
 	}
 
 	//adding the boxes and balls
@@ -136,17 +124,23 @@ namespace nao_actions
 	//setting the clear locations
 	for(int i= 1; i<=grid_size; i++)
 		for(int j=1; j<=grid_size; j++){
-			stringstream currLoc;
+			std::stringstream currLoc;
 			currLoc << "pos-" << i << "-" << j;
-			if(strcmp(robotLoc,currLoc.str()))
+			if(robotLoc.compare(currLoc.str())){
+				currentState.setBooleanPredicate("clear", currLoc.str(), false);			
 				continue;
+			}
 			std::vector<std::string>::iterator it;
 			it= find(boxLocs.begin(), boxLocs.end(), currLoc.str());
-			if(it!=boxLocs.end())
+			if(it!=boxLocs.end()){
+				currentState.setBooleanPredicate("clear", currLoc.str(), false);			
 				continue;
-			it= find(ballLocs.begin(), ballLocs.end(), currLoc.str());
-			if(it!=ballLocs.end())
+			}
+			it= find(ballLocs.begin(), boxLocs.end(), currLoc.str());
+			if(it!=ballLocs.end()){
+				currentState.setBooleanPredicate("clear", currLoc.str(), false);			
 				continue;
+			}
 			currentState.setBooleanPredicate("clear", currLoc.str(), true);
 		}
 	
@@ -166,7 +160,7 @@ namespace nao_actions
 	//setting the box locations initially
 	for(std::vector<std::string>::iterator it= boxes.begin(); it!= boxes.end(); ++it){
 		std::vector<std::string>::iterator ij= boxLocs.begin();
-		atPredicate.erase();
+		atPredicate.erase(atPredicate.begin(), atPredicate.end());
 		atPredicate.push_back(*it);
 		atPredicate.push_back(*ij);
 		++ij;
@@ -177,7 +171,7 @@ namespace nao_actions
 	//setting the ball locations initially
 	for(std::vector<std::string>::iterator it=balls.begin(); it!=balls.end(); ++it){
 		std::vector<std::string>::iterator ij= ballLocs.begin();
-		atPredicate.erase();
+		atPredicate.erase(atPredicate.begin(), atPredicate.end());
 		atPredicate.push_back(*it);
 		atPredicate.push_back(*ij);
 		++ij;
@@ -188,21 +182,7 @@ namespace nao_actions
 		
 
 
-        /*std::set<string> rooms;
-        std::set<string> doors;
-        std::set<string> static_objects;
-
-        goal.setForEachGoalStatement("manipulation_location", "searched", true);
-        goal.setForEachGoalStatement("movable_object", "tidy", true);
-        goal.setForEachGoalStatement("arm", "hand-free", true);
-        goal.setForEachGoalStatement("wipe_point", "wiped", true);
-
-        currentState.setBooleanPredicate("can-grasp", "right_arm", true);
-        currentState.setBooleanPredicate("can-grasp", "left_arm", true);
-
-        currentState.setObjectFluent("arm-state", "right_arm", "arm_unknown");
-        currentState.setObjectFluent("arm-state", "left_arm", "arm_unknown");
-	*/
+       
         return true;
     }
 

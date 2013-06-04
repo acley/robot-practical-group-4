@@ -45,7 +45,8 @@ namespace nao_actions
 	
 	    int cell_size, grid_size;
 	    std::string robotLoc, goalLoc;
-	    std::vector<std::string> boxLocs, ballLocs, boxes, balls;	    
+	    XmlRpc::XmlRpcValue xmlboxLocs, xmlballLocs, xmlboxes, xmlballs;	  
+	    std::vector<std::string> boxLocs, ballLocs, boxes, balls;  
 
             tf::TransformListener _tf;
 
