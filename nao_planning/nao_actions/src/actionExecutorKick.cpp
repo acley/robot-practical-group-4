@@ -1,14 +1,14 @@
 #include "nao_actions/actionExecutorKick.h"
 #include <pluginlib/class_list_macros.h>
 
-PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_Kick,
+PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_kick,
         nao_actions::ActionExecutorKick,
         continual_planning_executive::ActionExecutorInterface)
 
 namespace nao_actions
 {
 
-    bool ActionExecutorKick::fillGoal(test_msgs::KickGoal & goal,
+    bool ActionExecutorKick::fillGoal(nao_msgs::KickGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
         ROS_ASSERT(a.parameters.size() == 6);
@@ -27,7 +27,7 @@ namespace nao_actions
     }
 
     void ActionExecutorKick::updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-            const test_msgs::KickResult & result,
+            const nao_msgs::KickResult & result,
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("Kick returned result");
@@ -37,7 +37,7 @@ namespace nao_actions
         string loc_1 = a.parameters[2];
         string loc_2 = a.parameters[3];
         string loc_3 = a.parameters[4];
-        string direction = a.parameters[5]
+        string direction = a.parameters[5];
         
         	//~ (:durative-action kick
 		//~ :parameters (?r - robot ?b - ball ?l1 ?l2 ?l3 - location ?d1 - direction)
@@ -57,8 +57,8 @@ namespace nao_actions
         
         if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
             ROS_INFO("Kick succeeded.");
-            current.setBooleanPredicate("at", box + " " + loc_2, false);
-            current.setBooleanPredicate("at", box + " " + loc_3, true);
+            current.setBooleanPredicate("at", ball + " " + loc_2, false);
+            current.setBooleanPredicate("at", ball + " " + loc_3, true);
             current.setBooleanPredicate("clear", loc_3, false);
             current.setBooleanPredicate("clear", loc_2, true);
         }

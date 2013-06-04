@@ -1,21 +1,21 @@
 #include "nao_actions/actionExecutorWalk.h"
 #include <pluginlib/class_list_macros.h>
 
-PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_Walk,
+PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_walk,
         nao_actions::ActionExecutorWalk,
         continual_planning_executive::ActionExecutorInterface)
 
 namespace nao_actions
 {
 
-    bool ActionExecutorWalk::fillGoal(test_msgs::WalkGoal & goal,
+    bool ActionExecutorWalk::fillGoal(nao_msgs::WalkGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
         ROS_ASSERT(a.parameters.size() == 4);
         string robot = a.parameters[0];
         string loc_from = a.parameters[1];
         string loc_to = a.parameters[2];
-        string direction = a.parameters[3]
+        string direction = a.parameters[3];
         
         // set corresponding WalkGoal parameters
         // i.e.: goal.<fieldName> = <value>;
@@ -25,7 +25,7 @@ namespace nao_actions
     }
 
     void ActionExecutorWalk::updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-            const test_msgs::WalkResult & result,
+            const nao_msgs::WalkResult & result,
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("Walk returned result");
@@ -33,7 +33,7 @@ namespace nao_actions
         string robot = a.parameters[0];
         string loc_from = a.parameters[1];
         string loc_to = a.parameters[2];
-        string direction = a.parameters[3]]
+        string direction = a.parameters[3];
         
         		//~ (:durative-action move
 	   //~ :parameters (?r - robot ?from ?to - location ?dir - direction)

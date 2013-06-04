@@ -3,7 +3,7 @@
 
     <arg name="gui" default="0" />
     <arg name="paused" default="0" />
-    <arg name="config_pkg" />
+    <arg name="config_pkg" default="nao_config_simulation"/>
     <arg name="map_suffix" default="nao" />
 
     <rosparam command="load" ns="tfd_modules" file="$(find tfd_modules)/config/timeout_90s_5min_nontemporal.yaml" />

@@ -1,5 +1,20 @@
 <library path="lib/libnao_actions">
-    <class name="nao_actions/action_executor_pickup_object" type="nao_actions::ActionExecutorPickupObject"
+    <class name="nao_actions/action_executor_pickup" type="nao_actions::ActionExecutorPickup"
+        base_class_type="continual_planning_executive::ActionExecutorInterface">
+        <description>Action executor for picking up objects</description>
+    </class>
+
+    <class name="nao_actions/action_executor_kick" type="nao_actions::ActionExecutorKick"
+        base_class_type="continual_planning_executive::ActionExecutorInterface">
+        <description>Action executor for picking up objects</description>
+    </class>
+
+    <class name="nao_actions/action_executor_walk" type="nao_actions::ActionExecutorWalk"
+        base_class_type="continual_planning_executive::ActionExecutorInterface">
+        <description>Action executor for picking up objects</description>
+    </class>
+
+    <class name="nao_actions/action_executor_drop" type="nao_actions::ActionExecutorDrop"
         base_class_type="continual_planning_executive::ActionExecutorInterface">
         <description>Action executor for picking up objects</description>
     </class>

@@ -3,20 +3,22 @@
 
 #include "continual_planning_executive/actionExecutorActionlib.hpp"
 #include "continual_planning_executive/symbolicState.h"
-#include <test_msgs/PickupAction.h>
+#include <nao_msgs/PickupAction.h>
+#include "nao_msgs/PickupActionServer.cpp"
 
 namespace nao_actions
 {
 
-    class ActionExecutorPickup : public ActionExecutorActionlib<test_msgs::PickupAction,
-                                                    test_msgs::PickupGoal, test_msgs::PickupResult>
+    class ActionExecutorPickup : public ActionExecutorActionlib<nao_msgs::PickupAction,
+                                                    nao_msgs::PickupGoal, nao_msgs::PickupResult>
     {
         public:
-            virtual bool fillGoal(test_msgs::PickupGoal & goal,
+	    nao_msgs::PickupActionServer as_;
+            virtual bool fillGoal(nao_msgs::PickupGoal & goal,
                     const DurativeAction & a, const SymbolicState & current);
 
             virtual void updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-                    const test_msgs::PickupResult & result,
+                    const nao_msgs::PickupResult & result,
                     const DurativeAction & a, SymbolicState & current);
     };
 

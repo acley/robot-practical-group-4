@@ -3,7 +3,7 @@ state_creators:
 goal_creators:
     - nao_actions/goal_creator_tidyup_objects
 action_executors:
-    - nao_actions/action_executor_pickup_object pickup-object /tidyup/grasping_action
-    - nao_actions/action_executor_putdown_object putdown-object /tidyup/placing_action
-    - nao_actions/action_executor_detect_objects detect-objects /tidyup/detect_objects /tidyup/request_graspability table3_loc5
-    - planner_navigation_actions/action_executor_ros_navigation drive-base move_base start recent-detected-objects false
+    - nao_actions/action_executor_pickup pickup /nao_msgs/pickup_action_server
+    - nao_actions/action_executor_drop drop /nao_msgs/drop_action_server
+    - nao_actions/action_executor_walk walk /nao_msgs/walk_action_server
+    - nao_actions/action_executor_kick kick /nao_msgs/kick_action_server

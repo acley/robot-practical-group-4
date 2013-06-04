@@ -1,14 +1,14 @@
 #include "nao_actions/actionExecutorDrop.h"
 #include <pluginlib/class_list_macros.h>
 
-PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_Drop,
+PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_drop,
         nao_actions::ActionExecutorDrop,
         continual_planning_executive::ActionExecutorInterface)
 
 namespace nao_actions
 {
 
-    bool ActionExecutorDrop::fillGoal(test_msgs::DropGoal & goal,
+    bool ActionExecutorDrop::fillGoal(nao_msgs::DropGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
         ROS_ASSERT(a.parameters.size() == 5);
@@ -26,7 +26,7 @@ namespace nao_actions
     }
 
     void ActionExecutorDrop::updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-            const test_msgs::DropResult & result,
+            const nao_msgs::DropResult & result,
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("Drop returned result");

@@ -9,7 +9,9 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/nao_msgs</url>
   <depend package="geometry_msgs"/>
-  <depend package="visualization_msgs"/> 
+  <depend package="visualization_msgs"/>
+  <depend package="actionlib_msgs"/> 
+  <depend package="actionlib"/>
 
 </package>
 

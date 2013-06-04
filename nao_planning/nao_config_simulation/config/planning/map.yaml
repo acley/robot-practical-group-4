@@ -30,7 +30,7 @@ directions:
 - "dir-west"
 
 connections:
-- "pos-1-1 pos-1-2 dir-east"	
+- "pos-1-1 pos-1-2 dir-east"
 - "pos-1-1 pos-2-2 dir-southeast"
 - "pos-1-1 pos-2-1 dir-south"
 - "pos-1-2 pos-1-1 dir-west"

@@ -9,7 +9,7 @@
 			(MOVE-DIR ?l1 ?l2 - location ?d - direction))
 
 
-	(:durative-action move
+	(:durative-action walk
 	   :parameters (?r - robot ?from ?to - location ?dir - direction)
 	   :duration  (= ?duration 1)
 	   :condition (and (at start (at ?r ?from))
@@ -40,7 +40,7 @@
 			     ) 
 		)
 
-	(:durative-action pick-up
+	(:durative-action pickup
 		:parameters (?r - robot ?b - box ?l1 ?l2 - location ?d - direction)
 		:duration (= ?duration 3)
 		:condition (and (at start (HandEmpty ?r)) 

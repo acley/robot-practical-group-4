@@ -8,7 +8,7 @@ PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_pickup,
 namespace nao_actions
 {
 
-    bool ActionExecutorPickup::fillGoal(test_msgs::PickupGoal & goal,
+    bool ActionExecutorPickup::fillGoal(nao_msgs::PickupGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
         ROS_ASSERT(a.parameters.size() == 5);
@@ -26,7 +26,7 @@ namespace nao_actions
     }
 
     void ActionExecutorPickup::updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-            const test_msgs::PickupResult & result,
+            const nao_msgs::PickupResult & result,
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("PickupObject returned result");
