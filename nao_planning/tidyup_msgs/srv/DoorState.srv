@@ -1,5 +1,0 @@
----
-float64 DOOR_OPEN_ANGLE
-float64 DOOR_CLOSED_ANGLE
-bool door_found
-float64 angle
