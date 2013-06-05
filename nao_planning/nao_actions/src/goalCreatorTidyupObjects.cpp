@@ -96,6 +96,7 @@ namespace nao_actions
 			pos << "pos-" << i << "-" << j;
 			currentState.addObject(pos.str(), "location");
 			goal.addObject(pos.str(), "location");
+			currentState.setBooleanPredicate("clear", pos.str(), true);
 		}
 
 	//adding the directions
@@ -122,11 +123,11 @@ namespace nao_actions
 	goal.setBooleanPredicate("at", goalPred, true);
         
 	//setting the clear locations
-	for(int i= 1; i<=grid_size; i++)
+	/*for(int i= 1; i<=grid_size; i++)
 		for(int j=1; j<=grid_size; j++){
 			std::stringstream currLoc;
 			currLoc << "pos-" << i << "-" << j;
-			if(robotLoc.compare(currLoc.str())){
+			if(robotLoc.compare(currLoc.str())==0){
 				currentState.setBooleanPredicate("clear", currLoc.str(), false);			
 				continue;
 			}
@@ -142,7 +143,7 @@ namespace nao_actions
 				continue;
 			}
 			currentState.setBooleanPredicate("clear", currLoc.str(), true);
-		}
+		}*/
 	
 	//setting the connections
 	for(std::vector<std::string>::iterator it= connections.begin(); it!= connections.end(); ++it){
@@ -156,26 +157,29 @@ namespace nao_actions
 	atPredicate.push_back("robot");
 	atPredicate.push_back(robotLoc);
 	currentState.setBooleanPredicate("at", atPredicate, true);
+	currentState.setBooleanPredicate("clear", robotLoc, false);
 	
 	//setting the box locations initially
+	std::vector<std::string>::iterator ij= boxLocs.begin();
 	for(std::vector<std::string>::iterator it= boxes.begin(); it!= boxes.end(); ++it){
-		std::vector<std::string>::iterator ij= boxLocs.begin();
 		atPredicate.erase(atPredicate.begin(), atPredicate.end());
 		atPredicate.push_back(*it);
 		atPredicate.push_back(*ij);
+		currentState.setBooleanPredicate("clear", *ij, false);		
 		++ij;
 		currentState.setBooleanPredicate("at", atPredicate, true);	
-	
+		
 	}
 
 	//setting the ball locations initially
+	ij= ballLocs.begin();
 	for(std::vector<std::string>::iterator it=balls.begin(); it!=balls.end(); ++it){
-		std::vector<std::string>::iterator ij= ballLocs.begin();
 		atPredicate.erase(atPredicate.begin(), atPredicate.end());
 		atPredicate.push_back(*it);
-		atPredicate.push_back(*ij);
+		atPredicate.push_back(*ij);		
+		currentState.setBooleanPredicate("clear", *ij, false);
 		++ij;
-		currentState.setBooleanPredicate("at", atPredicate, true);		
+		currentState.setBooleanPredicate("at", atPredicate, true);
 	
 	}
 

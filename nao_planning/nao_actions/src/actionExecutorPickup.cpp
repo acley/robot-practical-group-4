@@ -1,5 +1,7 @@
 #include "nao_actions/actionExecutorPickup.h"
 #include <pluginlib/class_list_macros.h>
+#include <XmlRpcValue.h>
+#include <XmlRpcException.h>
 
 PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_pickup,
         nao_actions::ActionExecutorPickup,
@@ -37,27 +39,28 @@ namespace nao_actions
         string loc_2 = a.parameters[3];
         string direction = a.parameters[4];
         
-        	//~ (:durative-action pick-up
-		//~ :parameters (?r - robot ?b - box ?l1 ?l2 - location ?d - direction)
-		//~ :duration (= ?duration 3)
-		//~ :condition (and (at start (HandEmpty ?r)) 
-				//~ (at start (at ?r ?l1)) 
-				//~ (at start (at ?b ?l2)) 
-				//~ (at start (MOVE-DIR ?l1 ?l2 ?d)) 
-				//~ )
-		//~ :effect (and (at end (not (HandEmpty ?r)))
-			     //~ (at end (not (at ?b ?l2)))
-			     //~ (at end (clear ?l2)) 
-                             //~ (at end (Holding ?r ?b)) 
-			     //~ )
-		//~ )
-        
-        if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
-            ROS_INFO("Pickup succeeded.");
-            current.setBooleanPredicate("HandEmpty", robot, false);
-            current.setBooleanPredicate("at", box + " " + loc_2, false);
-            current.setBooleanPredicate("clear", loc_2, true);
-            current.setBooleanPredicate("Holding", robot + " " + box, true);
+	if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
+		ROS_INFO("Pickup succeeded.");
+		current.setBooleanPredicate("HandEmpty", robot, false);
+		current.setBooleanPredicate("at", box + " " + loc_2, false);
+		current.setBooleanPredicate("clear", loc_2, true);
+		current.setBooleanPredicate("Holding", robot + " " + box, true);
+
+		ros::NodeHandle nhPriv("~");
+		XmlRpc::XmlRpcValue boxLocs, boxes;
+		nhPriv.getParam("boxLocs", boxLocs);
+		nhPriv.getParam("boxes", boxes);
+
+		ROS_ASSERT(boxLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+		ROS_ASSERT(boxes.getType() == XmlRpc::XmlRpcValue::TypeArray);	
+		for(int i=0; i<boxLocs.size(); i++){
+			if(static_cast<std::string>(boxes[i]).compare(box)==0){
+				boxLocs[i]= loc_2;
+				break;
+			}
+		}
+		nhPriv.setParam("boxLocs", boxLocs);
+
         }
     }
 

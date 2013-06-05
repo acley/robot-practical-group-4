@@ -1,5 +1,7 @@
 #include "nao_actions/actionExecutorKick.h"
 #include <pluginlib/class_list_macros.h>
+#include <XmlRpcValue.h>
+#include <XmlRpcException.h>
 
 PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_kick,
         nao_actions::ActionExecutorKick,
@@ -39,28 +41,28 @@ namespace nao_actions
         string loc_3 = a.parameters[4];
         string direction = a.parameters[5];
         
-        	//~ (:durative-action kick
-		//~ :parameters (?r - robot ?b - ball ?l1 ?l2 ?l3 - location ?d1 - direction)
-		//~ :duration (= ?duration 1)
-		//~ :condition (and (at start (at ?b ?l2))
-				//~ (at start (at ?r ?l1)) 
-				//~ (at start (clear ?l3))
-				//~ (at start (MOVE-DIR ?l1 ?l2 ?d1)) 
-				//~ (at start (MOVE-DIR ?l2 ?l3 ?d1)) 
-				//~ )
-		//~ :effect	(and (at end (not (at ?b ?l2)))
-			     //~ (at end (at ?b ?l3)) 
-			     //~ (at end (not (clear ?l3))) 
-			     //~ (at end(clear ?l2)) 
-			     //~ ) 
-		//~ )))
-        
-        if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
-            ROS_INFO("Kick succeeded.");
-            current.setBooleanPredicate("at", ball + " " + loc_2, false);
-            current.setBooleanPredicate("at", ball + " " + loc_3, true);
-            current.setBooleanPredicate("clear", loc_3, false);
-            current.setBooleanPredicate("clear", loc_2, true);
+	if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
+		ROS_INFO("Kick succeeded.");
+		current.setBooleanPredicate("at", ball + " " + loc_2, false);
+		current.setBooleanPredicate("at", ball + " " + loc_3, true);
+		current.setBooleanPredicate("clear", loc_3, false);
+		current.setBooleanPredicate("clear", loc_2, true);
+
+		ros::NodeHandle nhPriv("~");
+		XmlRpc::XmlRpcValue ballLocs, balls;
+		nhPriv.getParam("ballLocs", ballLocs);
+		nhPriv.getParam("balls", balls);
+
+		ROS_ASSERT(ballLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+		ROS_ASSERT(balls.getType() == XmlRpc::XmlRpcValue::TypeArray);	
+		for(int i=0; i<ballLocs.size(); i++){
+			if(static_cast<std::string>(balls[i]).compare(ball)==0){
+				ballLocs[i]= loc_3;
+				break;
+			}
+		}
+		nhPriv.setParam("ballLocs", ballLocs);
+
         }
     }
 

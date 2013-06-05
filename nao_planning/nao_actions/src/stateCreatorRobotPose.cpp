@@ -113,9 +113,9 @@ namespace nao_actions
 	//sets the current location for the robot and the observed objects
         bool StateCreatorRobotPose::fillState(SymbolicState & state)
         {
-		geometry_msgs::PoseStamped robotPose;
+		/*geometry_msgs::PoseStamped robotPose;
+		
 		//call to service to get the current robot location
-		//PS fix the include statements!!!
 		ros::NodeHandle node;
 		ros::ServiceClient client = node.serviceClient<nao_msgs::RobotLocation>("RobotLocation");
 		nao_msgs::RobotLocation srv;
@@ -169,105 +169,12 @@ namespace nao_actions
 			ROS_ERROR("Cannot extract object locations");
 			return false;
 		}
-
+		*/
 		if(s_PublishLocationsAsMarkers)
                		publishLocationsAsMarkers(state);
 		return true;
 
-/*
 
-            tf::StampedTransform transform;
-            try{
-                _tf.lookupTransform("/map", "/base_link", ros::Time(0), transform);
-            }
-            catch (tf::TransformException& ex){
-                ROS_ERROR("%s",ex.what());
-                return false;
-            }
-
-            // 1. Real robot location
-            if(!_robotPoseObject.empty()) {
-                ROS_ASSERT(!_robotPoseType.empty());
-                state.addObject(_robotPoseObject, _robotPoseType);
-                state.setNumericalFluent("x", _robotPoseObject, transform.getOrigin().x());
-                state.setNumericalFluent("y", _robotPoseObject, transform.getOrigin().y());
-                state.setNumericalFluent("z", _robotPoseObject, transform.getOrigin().z());
-                state.setNumericalFluent("qx", _robotPoseObject, transform.getRotation().x());
-                state.setNumericalFluent("qy", _robotPoseObject, transform.getRotation().y());
-                state.setNumericalFluent("qz", _robotPoseObject, transform.getRotation().z());
-                state.setNumericalFluent("qw", _robotPoseObject, transform.getRotation().w());
-                state.setNumericalFluent("timestamp", _robotPoseObject, ros::Time::now().toSec());
-                state.addObject("/map", "frameid");
-                state.setObjectFluent("frame-id", _robotPoseObject, "/map");
-            }
-
-            // 2.b check if we are at any _locations
-            pair<SymbolicState::TypedObjectConstIterator, SymbolicState::TypedObjectConstIterator> targets =
-                state.getTypedObjects().equal_range(_locationType);
-
-            double minDist = HUGE_VAL;
-            string nearestTarget = "";
-
-            int atLocations = 0;
-            for(SymbolicState::TypedObjectConstIterator it = targets.first; it != targets.second; it++) {
-                string target = it->second;
-                if(target == _robotPoseObject)  // skip current robot location
-                    continue;
-
-                geometry_msgs::PoseStamped targetPose;
-                if(!extractPoseStamped(state, target, targetPose)) {
-                    ROS_ERROR("%s: could not extract pose for target object: %s.", __func__, target.c_str());
-                    continue; 
-                }
-                if(targetPose.header.frame_id != "/map") {
-                    ROS_ERROR("Target pose %s had frame-id: %s - should be /map.",
-                            target.c_str(), targetPose.header.frame_id.c_str());
-                    continue;
-                }
-
-                // compute dXY, dYaw between current pose and target
-                tf::Transform targetTransform;//(btQuaternion(qx, qy, qz, qw), btVector3(posX, posY, 0.0));
-                tf::poseMsgToTF(targetPose.pose, targetTransform);
-                tf::Transform deltaTransform = targetTransform.inverseTimes(transform);
-
-                double dDist = hypot(deltaTransform.getOrigin().x(), deltaTransform.getOrigin().y());
-                double dAng = tf::getYaw(deltaTransform.getRotation());
-                ROS_INFO("Target %s dist: %f m ang: %f deg", target.c_str(), dDist, angles::to_degrees(dAng));
-
-                if(!_atPredicate.empty()) {
-                    // Found a target - update state!
-                    if(dDist < _goalToleranceXY && fabs(dAng) < _goalToleranceYaw) {
-                        ROS_INFO("(at) target %s !", target.c_str());
-                        state.setBooleanPredicate(_atPredicate, target, true);
-                        atLocations++;
-                    } else {
-                        state.setBooleanPredicate(_atPredicate, target, false);
-                    }
-                    if(dDist < minDist) {
-                        minDist = dDist;
-                        nearestTarget = target;
-                    }
-                }
-            }
-
-            ROS_INFO("Nearest target is %s (%f m).", nearestTarget.c_str(), minDist);
-
-            // 2.a Set the robot pose, if we are not already at another pose
-            if(!_atPredicate.empty() && !_robotPoseObject.empty()) {
-                if(atLocations == 0) {
-                    state.setBooleanPredicate(_atPredicate, _robotPoseObject, true);
-                } else {
-                    state.setBooleanPredicate(_atPredicate, _robotPoseObject, false);
-                    if(atLocations > 1) {
-                        ROS_WARN("We are at %d locations at the same time!.", atLocations);
-                    }
-                }
-            }
-
-            if(s_PublishLocationsAsMarkers)
-                publishLocationsAsMarkers(state);
-
-            return true;*/
         }
 
 	
@@ -277,6 +184,74 @@ namespace nao_actions
      */
     void StateCreatorRobotPose::publishLocationsAsMarkers(const SymbolicState & state)
     {
+
+	ros::NodeHandle nhPriv("~");
+	nhPriv.getParam("robotLoc", robotLoc);
+	robotLoc= robotLoc.substr(4);
+	int index= robotLoc.find("-");
+	double robotLocX= atof((robotLoc.substr(0, index-1).c_str()))*cell_size;
+	double robotLocY= atof((robotLoc.substr(index+1).c_str()))*cell_size;
+	ros::NodeHandle node;
+	visualization_msgs::MarkerArray ma;
+	visualization_msgs::Marker robLoc;
+	robLoc.ns= "robot";
+	robLoc.id= 0;
+	robLoc.pose.position.x= robotLocX;
+	robLoc.pose.position.y= robotLocY;
+	robLoc.header.frame_id= "/base_link";
+	robLoc.header.stamp= ros::Time::now();
+	robLoc.type= visualization_msgs::Marker::ARROW;
+	robLoc.action= visualization_msgs::Marker::ADD;
+	ma.markers.push_back(robLoc);
+
+	nhPriv.getParam("boxes", xmlboxes);
+	nhPriv.getParam("boxLocs", xmlboxLocs);
+	ROS_ASSERT(xmlboxLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlboxes.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	visualization_msgs::Marker box;
+	double boxX, boxY;
+	std::string currBoxLoc;
+	for(int i=0; i<xmlboxes.size(); i++){
+		box.ns= static_cast<std::string>(xmlboxes[i]);
+		currBoxLoc= static_cast<std::string>(xmlboxLocs[i]);
+		currBoxLoc= currBoxLoc.substr(4);
+		index= currBoxLoc.find("-");		
+		boxX= atof((currBoxLoc.substr(0,index-1).c_str()))*cell_size;
+		boxY= atof((currBoxLoc.substr(index+1).c_str()))*cell_size;
+		box.pose.position.x= boxX;
+		box.pose.position.y= boxY;
+		box.header.frame_id= "/base_link";
+		box.header.stamp= ros::Time::now();
+		box.type= visualization_msgs::Marker::CUBE;
+		box.action= visualization_msgs::Marker::ADD;
+		ma.markers.push_back(box);
+	}	
+
+	nhPriv.getParam("balls", xmlballs);
+	nhPriv.getParam("ballLocs", xmlballLocs);
+	ROS_ASSERT(xmlballLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlballs.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	visualization_msgs::Marker ball;
+	double ballX, ballY;
+	std::string currballLoc;
+	for(int i=0; i<xmlballs.size(); i++){
+		ball.ns= static_cast<std::string>(xmlballs[i]);
+		currballLoc= static_cast<std::string>(xmlballLocs[i]);
+		currballLoc= currballLoc.substr(4);
+		index= currballLoc.find("-");		
+		ballX= atof((currballLoc.substr(0,index-1).c_str()))*cell_size;
+		ballY= atof((currballLoc.substr(index+1).c_str()))*cell_size;
+		ball.pose.position.x= ballX;
+		ball.pose.position.y= ballY;
+		ball.header.frame_id= "/base_link";
+		ball.header.stamp= ros::Time::now();
+		ball.type= visualization_msgs::Marker::CUBE;
+		ball.action= visualization_msgs::Marker::ADD;
+		ma.markers.push_back(ball);
+	}	
+
+/*
+
 	ros::NodeHandle node;
 	ros::ServiceClient client = node.serviceClient<nao_msgs::RobotLocation>("RobotLocation");
 	nao_msgs::RobotLocation srv;
@@ -313,80 +288,9 @@ namespace nao_actions
 	else{
 		ROS_ERROR("Cannot extract object locations");
 		return;
-	}
+	}*/
 
 	_markerPub.publish(ma);
-        /*if(!_markerPub) {
-            ROS_WARN("%s: _markerPub invalid.", __func__);
-            return;
-        }
-
-        visualization_msgs::MarkerArray ma;
-
-        if(!_locationType.empty()) {
-            // Check if we are at any grasp_locations
-            pair<SymbolicState::TypedObjectConstIterator, SymbolicState::TypedObjectConstIterator> targets =
-                state.getTypedObjects().equal_range(_locationType);
-
-            unsigned int count = 0;
-            for(SymbolicState::TypedObjectConstIterator it = targets.first; it != targets.second; it++) {
-                string target = it->second;
-                if(target == _robotPoseObject)  // skip current robot location
-                    continue;
-
-                visualization_msgs::MarkerArray marks = getLocationMarkers(state, target,
-                        "target_locations", count, false);
-                forEach(visualization_msgs::Marker & mark, marks.markers) {
-                    if(mark.header.frame_id.empty())    // invalid mark
-                        continue;
-                    ma.markers.push_back(mark);
-                }
-                count += 2;
-                
-                if(s_PublishMeshMarkers) {
-                    visualization_msgs::MarkerArray marks = getLocationMarkers(state, target,
-                            "target_locations", count, true);
-                    forEach(visualization_msgs::Marker & mark, marks.markers) {
-                        if(mark.header.frame_id.empty())    // invalid mark
-                            continue;
-                        ma.markers.push_back(mark);
-                    }
-                }
-            }
-
-            // all should be overwritten as #targets is const, but to be safe
-            for(unsigned int i = count; i < 100; i++) {
-                visualization_msgs::Marker mark;
-                mark.header.frame_id = "/map";
-                mark.ns = "target_locations";
-                mark.id = i;
-                mark.action = visualization_msgs::Marker::DELETE;
-                ma.markers.push_back(mark);
-            }
-        }
-
-        // finally robot location marker
-        if(!_robotPoseObject.empty()) {
-            visualization_msgs::MarkerArray marks = getLocationMarkers(state, _robotPoseObject,
-                    "robot_location", 0, false);
-            forEach(visualization_msgs::Marker & mark, marks.markers) {
-                if(mark.header.frame_id.empty())    // invalid mark
-                    mark.action = visualization_msgs::Marker::DELETE;
-                ma.markers.push_back(mark);
-            }
-
-            if(s_PublishMeshMarkers) {
-                visualization_msgs::MarkerArray marks = getLocationMarkers(state, _robotPoseObject,
-                        "robot_location", 0, true);
-                forEach(visualization_msgs::Marker & mark, marks.markers) {
-                    if(mark.header.frame_id.empty())    // invalid mark
-                        continue;
-                    ma.markers.push_back(mark);
-                }
-            }
-        }
-
-        _markerPub.publish(ma);*/
     }
 
 };

@@ -9,7 +9,7 @@
     <rosparam command="load" ns="tfd_modules" file="$(find tfd_modules)/config/timeout_90s_5min_nontemporal.yaml" />
 
     <!-- start executive -->
-    <node pkg="continual_planning_executive" type="continual_planning_executive" args="" respawn="true" name="continual_planning_executive" output="screen" >
+    <node pkg="continual_planning_executive" type="continual_planning_executive" args="" respawn="false" name="continual_planning_executive" output="screen" >
         <param name="start_paused" value="$(arg paused)" />
         <param name="domain_file" value="$(find nao_domains)/nao-world/nao-world.pddl" />
 

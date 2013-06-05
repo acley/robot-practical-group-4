@@ -34,27 +34,17 @@ namespace nao_actions
         string loc_from = a.parameters[1];
         string loc_to = a.parameters[2];
         string direction = a.parameters[3];
-        
-        		//~ (:durative-action move
-	   //~ :parameters (?r - robot ?from ?to - location ?dir - direction)
-	   //~ :duration  (= ?duration 1)
-	   //~ :condition (and (at start (at ?r ?from))
-		           //~ (at start (clear ?to))
-		           //~ (over all (MOVE-DIR ?from ?to ?dir))
-		           //~ )
-	   //~ :effect    (and (at start (not (at ?p ?from)))
-		           //~ (at start (not (clear ?to)))
-		           //~ (at end (at ?r ?to))
-		           //~ (at end (clear ?from))
-		           //~ )
-	   //~ )
        
-       if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
-           ROS_INFO("Walk succeeded.");
-           current.setBooleanPredicate("at", robot + " " + loc_from, false);
-           current.setBooleanPredicate("clear", loc_to, false);
-           current.setBooleanPredicate("at", robot + " " + loc_to, true);
-           current.setBooleanPredicate("clear", loc_from, true);
+        if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
+		ROS_INFO("Walk succeeded.");
+		current.setBooleanPredicate("at", robot + " " + loc_from, false);
+		current.setBooleanPredicate("clear", loc_to, false);
+		current.setBooleanPredicate("at", robot + " " + loc_to, true);
+		current.setBooleanPredicate("clear", loc_from, true);
+
+		ros::NodeHandle nhPriv("~");
+		nhPriv.setParam("robotLoc", loc_to);
+		
        }
     }
 
