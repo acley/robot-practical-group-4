@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "pickup_server");
   ros::NodeHandle n;
-  Server server(n, "pickup", boost::bind(&execute, _1, &server), false);
+  Server server(n, "/nao_msgs/pickup_action_server", boost::bind(&execute, _1, &server), false);
   server.start();
   ros::spin();
   return 0;

@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "walk_server");
   ros::NodeHandle n;
-  Server server(n, "walk", boost::bind(&execute, _1, &server), false);
+  Server server(n, "/nao_msgs/walk_action_server", boost::bind(&execute, _1, &server), false);
   server.start();
   ros::spin();
   return 0;

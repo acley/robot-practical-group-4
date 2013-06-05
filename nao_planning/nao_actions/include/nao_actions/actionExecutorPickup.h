@@ -4,7 +4,6 @@
 #include "continual_planning_executive/actionExecutorActionlib.hpp"
 #include "continual_planning_executive/symbolicState.h"
 #include <nao_msgs/PickupAction.h>
-#include "nao_msgs/PickupActionServer.cpp"
 
 namespace nao_actions
 {
@@ -13,7 +12,6 @@ namespace nao_actions
                                                     nao_msgs::PickupGoal, nao_msgs::PickupResult>
     {
         public:
-	    nao_msgs::PickupActionServer as_;
             virtual bool fillGoal(nao_msgs::PickupGoal & goal,
                     const DurativeAction & a, const SymbolicState & current);
 
