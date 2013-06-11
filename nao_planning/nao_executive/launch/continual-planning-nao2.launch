@@ -22,7 +22,7 @@
         <param name="domain_file" value="$(find nao_domains)/nao-world/nao-world.pddl" />
 
         <rosparam command="load" file="$(arg config_pkg)/config/planning/$(arg map_suffix)_actions.yaml" />
-	<rosparam command="load" file="$(arg config_pkg)/config/planning/map.yaml" />
+	<rosparam command="load" file="$(arg config_pkg)/config/planning/map2.yaml" />
         <rosparam command="load" file="$(find tfd_modules)/config/tfdm_interface.yaml" />
         <!-- navstack_init "fixed_frame" "goal_tolerance used in planner requests" 
              "goal_tolerance is relative to move_base's xy_goal_tolerance either
@@ -34,8 +34,6 @@
     </node>
 
     <node if="$(arg gui)" pkg="continual_planning_monitor" type="continual_planning_monitor" name="continual_planning_monitor" />
-
-    
 
 </launch>
 

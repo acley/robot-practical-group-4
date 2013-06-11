@@ -6,18 +6,26 @@ goalLoc: "pos-4-4"
 boxes:
 - "box1"
 - "box2"
+- "box3"
+- "box4"
 
 balls:
 - "ball1"
 - "ball2"
+- "ball3"
+- "ball4"
 
 boxLocs:
 - "pos-2-2"
 - "pos-4-2"
+- "pos-3-4"
+- "pos-4-3"
 
 ballLocs:
 - "pos-1-3"
 - "pos-3-3"
+- "pos-1-2"
+- "pos-2-1"
 
 directions:
 - "dir-east"
