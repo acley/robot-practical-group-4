@@ -25,6 +25,7 @@ namespace nao_actions
 	nhPriv.getParam("cell_size", cell_size);
 	nhPriv.getParam("grid_size", grid_size);
 	nhPriv.getParam("robotLoc", robotLoc);
+	nhPriv.getParam("robotDir", robotDir);
 	nhPriv.getParam("goalLoc", goalLoc);
 	nhPriv.getParam("boxLocs", xmlboxLocs);
 	nhPriv.getParam("ballLocs", xmlballLocs);
@@ -202,11 +203,11 @@ namespace nao_actions
 	robLoc.header.stamp= ros::Time::now();
 	robLoc.type= visualization_msgs::Marker::ARROW;
 	robLoc.action= visualization_msgs::Marker::ADD;
-    robLoc.scale.x= 100;
-    robLoc.scale.y= 100;
-    robLoc.scale.z= 10;
-    robLoc.color.r= 1.0;
-    robLoc.color.a= 1.0;
+    	robLoc.scale.x= 100;
+    	robLoc.scale.y= 100;
+    	robLoc.scale.z= 10;
+    	robLoc.color.r= 1.0;
+    	robLoc.color.a= 1.0;
 	ma.markers.push_back(robLoc);
     
    
@@ -227,38 +228,37 @@ namespace nao_actions
 		boxX= atof((currBoxLoc.substr(0,index).c_str()))*cell_size + 0.5 * cell_size;
 		boxY= atof((currBoxLoc.substr(index+1).c_str()))*cell_size + 0.5 * cell_size;
         
-        double box_size = 0; //25;
-        // Check if the robot is holding this box.
-        Predicate bp;
-        bp.name= "Holding";
-        std::vector<string> parameters;
-        parameters.push_back("robot");
-        parameters.push_back(box.ns);
-        bp.parameters= parameters;
-        bool value = true;
-        if (state.hasBooleanPredicate(bp, &value)) {
-            box.pose.position.x= robotLocX;
-            box.pose.position.y= robotLocY;
-            box.pose.position.z= box_size;
-            box.scale.x= 15;
-            box.scale.y= 15;
-            box.scale.z= 15;
-        } else {
-            box.pose.position.x= boxX;
-            box.pose.position.y= boxY;
-            box.pose.position.z= box_size;
-            box.scale.x= 25;
-            box.scale.y= 25;
-            box.scale.z= 25;
-        }
-        
+		double box_size = 0; //25;
+		// Check if the robot is holding this box.
+		Predicate bp;
+		bp.name= "Holding";
+		std::vector<string> parameters;
+		parameters.push_back("robot");
+		parameters.push_back(box.ns);
+		bp.parameters= parameters;
+		bool value = true;
+		if (state.hasBooleanPredicate(bp, &value)) {
+		    box.pose.position.x= robotLocX;
+		    box.pose.position.y= robotLocY;
+		    box.pose.position.z= box_size;
+		    box.scale.x= 15;
+		    box.scale.y= 15;
+		    box.scale.z= 15;
+		} else {
+		    box.pose.position.x= boxX;
+		    box.pose.position.y= boxY;
+		    box.pose.position.z= box_size;
+		    box.scale.x= 25;
+		    box.scale.y= 25;
+		    box.scale.z= 25;
+		}
+		
 		box.header.frame_id= "/base_link";
 		box.header.stamp= ros::Time::now();
 		box.type= visualization_msgs::Marker::CUBE;
 		box.action= visualization_msgs::Marker::ADD;
-        box.color.g= 1.0;
-        box.color.a= 1.0;
-        
+		box.color.g= 1.0;
+		box.color.a= 1.0;
 		ma.markers.push_back(box);
 	}	
 
@@ -284,11 +284,11 @@ namespace nao_actions
 		ball.header.stamp= ros::Time::now();
 		ball.type= visualization_msgs::Marker::SPHERE;
 		ball.action= visualization_msgs::Marker::ADD;
-        ball.scale.x= 25;
-        ball.scale.y= 25;
-        ball.scale.z= 25;
-        ball.color.b= 1.0;
-        ball.color.a= 1.0;
+		ball.scale.x= 25;
+		ball.scale.y= 25;
+		ball.scale.z= 25;
+		ball.color.b= 1.0;
+		ball.color.a= 1.0;
 		ma.markers.push_back(ball);
 	}
 

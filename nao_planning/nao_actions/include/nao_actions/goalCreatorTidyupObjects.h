@@ -21,10 +21,10 @@ namespace nao_actions
 	// assume that the cells are 8 way connected
 	// cell size is in cms
 	int cell_size, grid_size;
-	std::string robotLoc, goalLoc;
+	std::string robotLoc, goalLoc, robotDir;
 	//check XmlRpc format
-	XmlRpc::XmlRpcValue xmlboxLocs, xmlballLocs, xmlboxes, xmlballs, xmlconnections, xmldirections;
-	std::vector<std::string> boxLocs, ballLocs, boxes, balls, connections, directions;
+	XmlRpc::XmlRpcValue xmlboxLocs, xmlballLocs, xmlboxes, xmlballs, xmlconnections, xmldirections, xmlLeftOf;
+	std::vector<std::string> boxLocs, ballLocs, boxes, balls, connections, directions, leftOf;
     };
 
 };

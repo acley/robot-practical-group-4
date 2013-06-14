@@ -12,6 +12,8 @@
     <node name= "pickup_action_server" pkg= "nao_msgs" type= "pickup_action_server"/>
     <node name= "drop_action_server" pkg= "nao_msgs" type= "drop_action_server"/>
     <node name= "walk_action_server" pkg= "nao_msgs" type= "walk_action_server"/>
+    <node name= "walkholding_action_server" pkg= "nao_msgs" type= "walkholding_action_server"/>
+    <node name= "turn_action_server" pkg= "nao_msgs" type= "turn_action_server"/>
     
     <node name= "rviz" pkg= "rviz" type= "rviz"/>
 

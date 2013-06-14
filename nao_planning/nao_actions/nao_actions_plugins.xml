@@ -14,6 +14,16 @@
         <description>Action executor for picking up objects</description>
     </class>
 
+    <class name="nao_actions/action_executor_walkholding" type="nao_actions::ActionExecutorWalkHolding"
+        base_class_type="continual_planning_executive::ActionExecutorInterface">
+        <description>Action executor for picking up objects</description>
+    </class>
+
+    <class name="nao_actions/action_executor_turn" type="nao_actions::ActionExecutorTurn"
+        base_class_type="continual_planning_executive::ActionExecutorInterface">
+        <description>Action executor for picking up objects</description>
+    </class>
+
     <class name="nao_actions/action_executor_drop" type="nao_actions::ActionExecutorDrop"
         base_class_type="continual_planning_executive::ActionExecutorInterface">
         <description>Action executor for picking up objects</description>

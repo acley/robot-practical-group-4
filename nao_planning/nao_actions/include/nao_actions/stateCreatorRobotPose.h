@@ -44,7 +44,7 @@ namespace nao_actions
         protected:
 	
 	    int cell_size, grid_size;
-	    std::string robotLoc, goalLoc;
+	    std::string robotLoc, goalLoc, robotDir;
 	    XmlRpc::XmlRpcValue xmlboxLocs, xmlballLocs, xmlboxes, xmlballs;	  
 	    std::vector<std::string> boxLocs, ballLocs, boxes, balls;  
 

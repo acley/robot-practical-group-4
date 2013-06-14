@@ -13,7 +13,7 @@ namespace nao_actions
     bool ActionExecutorKick::fillGoal(nao_msgs::KickGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
-        ROS_ASSERT(a.parameters.size() == 6);
+        ROS_ASSERT(a.parameters.size() == 8);
         string robot = a.parameters[0];
         string ball = a.parameters[1];
         string loc_1 = a.parameters[2];
@@ -33,13 +33,16 @@ namespace nao_actions
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("Kick returned result");
-        ROS_ASSERT(a.parameters.size() == 6);
+        ROS_ASSERT(a.parameters.size() == 8);
         string robot = a.parameters[0];
-        string ball = a.parameters[1];
-        string loc_1 = a.parameters[2];
-        string loc_2 = a.parameters[3];
-        string loc_3 = a.parameters[4];
-        string direction = a.parameters[5];
+	string robotDir= a.parameters[1];
+        string ball = a.parameters[2];
+        string loc_1 = a.parameters[3];
+        string loc_2 = a.parameters[4];
+        string loc_3 = a.parameters[5];
+        string dir1 = a.parameters[6];
+	string dir2 = a.parameters[7];
+
         
 	if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
 		ROS_INFO("Kick succeeded.");

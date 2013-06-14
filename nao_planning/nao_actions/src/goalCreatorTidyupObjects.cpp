@@ -58,6 +58,7 @@ namespace nao_actions
 	nhPriv.getParam("cell_size", cell_size);
 	nhPriv.getParam("grid_size", grid_size);
 	nhPriv.getParam("robotLoc", robotLoc);
+	nhPriv.getParam("robotDir", robotDir);
 	nhPriv.getParam("goalLoc", goalLoc);
 	nhPriv.getParam("boxLocs", xmlboxLocs);
 	nhPriv.getParam("ballLocs", xmlballLocs);
@@ -65,6 +66,7 @@ namespace nao_actions
 	nhPriv.getParam("balls", xmlballs);
 	nhPriv.getParam("connections", xmlconnections);
 	nhPriv.getParam("directions", xmldirections);
+	nhPriv.getParam("leftOf", xmlLeftOf);
 
 	ROS_ASSERT(xmlboxLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
 	ROS_ASSERT(xmlballLocs.getType() == XmlRpc::XmlRpcValue::TypeArray);
@@ -72,6 +74,7 @@ namespace nao_actions
 	ROS_ASSERT(xmlballs.getType() == XmlRpc::XmlRpcValue::TypeArray);
 	ROS_ASSERT(xmlconnections.getType() == XmlRpc::XmlRpcValue::TypeArray);
 	ROS_ASSERT(xmldirections.getType() == XmlRpc::XmlRpcValue::TypeArray);
+	ROS_ASSERT(xmlLeftOf.getType() == XmlRpc::XmlRpcValue::TypeArray);
 
 	//copying xmlrpc data to vectors
 	for(int i=0; i<xmlboxLocs.size(); i++){
@@ -87,6 +90,9 @@ namespace nao_actions
 	}
 	for(int i=0; i<xmldirections.size(); i++){
 		directions.push_back(xmldirections[i]);
+	}
+	for(int i=0; i<xmlLeftOf.size(); i++){
+		leftOf.push_back(xmlLeftOf[i]);
 	}
 
 	//adding locations
@@ -150,6 +156,11 @@ namespace nao_actions
 		currentState.setBooleanPredicate("MOVE-DIR", *it, true);
 	}
 
+	//setting leftOf
+	for(std::vector<std::string>::iterator it= leftOf.begin(); it!= leftOf.end(); ++it){
+		currentState.setBooleanPredicate("LeftOf", *it, true);
+	}
+
 	currentState.setBooleanPredicate("HandEmpty", "robot", true);
 	
 	//setting the robot location initially	
@@ -159,6 +170,12 @@ namespace nao_actions
 	currentState.setBooleanPredicate("at", atPredicate, true);
 	currentState.setBooleanPredicate("clear", robotLoc, false);
 	
+	//setting the robot orientation initially
+	std::vector<std::string> orient;
+	orient.push_back("robot");
+	orient.push_back(robotDir);
+	currentState.setBooleanPredicate("Orientation", orient, true);
+
 	//setting the box locations initially
 	std::vector<std::string>::iterator ij= boxLocs.begin();
 	for(std::vector<std::string>::iterator it= boxes.begin(); it!= boxes.end(); ++it){

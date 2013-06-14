@@ -34,4 +34,6 @@ src/stateCreatorRobotPose.cpp
 src/actionExecutorDrop.cpp
 src/actionExecutorKick.cpp
 src/actionExecutorWalk.cpp
-src/actionExecutorPickup.cpp)
+src/actionExecutorPickup.cpp
+src/actionExecutorWalkholding.cpp
+src/actionExecutorTurn.cpp)
