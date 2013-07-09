@@ -8,7 +8,7 @@ PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_turn,
 namespace nao_actions
 {
 
-    bool ActionExecutorTurn::fillGoal(nao_msgs::TurnGoal & goal,
+    bool ActionExecutorTurn::fillGoal(nao_world_msgs::TurnGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
         ROS_ASSERT(a.parameters.size() == 3);
@@ -25,7 +25,7 @@ namespace nao_actions
 
 
     void ActionExecutorTurn::updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-            const nao_msgs::TurnResult & result,
+            const nao_world_msgs::TurnResult & result,
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("Turn returned result");

@@ -10,7 +10,7 @@ PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_kick,
 namespace nao_actions
 {
 
-    bool ActionExecutorKick::fillGoal(nao_msgs::KickGoal & goal,
+    bool ActionExecutorKick::fillGoal(nao_world_msgs::KickGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
         ROS_ASSERT(a.parameters.size() == 8);
@@ -29,7 +29,7 @@ namespace nao_actions
     }
 
     void ActionExecutorKick::updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-            const nao_msgs::KickResult & result,
+            const nao_world_msgs::KickResult & result,
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("Kick returned result");

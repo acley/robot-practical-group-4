@@ -8,7 +8,7 @@ PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_walk,
 namespace nao_actions
 {
 
-    bool ActionExecutorWalk::fillGoal(nao_msgs::WalkGoal & goal,
+    bool ActionExecutorWalk::fillGoal(nao_world_msgs::WalkGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
         ROS_ASSERT(a.parameters.size() == 4);
@@ -25,7 +25,7 @@ namespace nao_actions
     }
 
     void ActionExecutorWalk::updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-            const nao_msgs::WalkResult & result,
+            const nao_world_msgs::WalkResult & result,
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("Walk returned result");

@@ -3,9 +3,9 @@ state_creators:
 goal_creators:
     - nao_actions/goal_creator_tidyup_objects
 action_executors:
-    - nao_actions/action_executor_pickup pickup /nao_msgs/pickup_action_server
-    - nao_actions/action_executor_drop drop /nao_msgs/drop_action_server
-    - nao_actions/action_executor_walk walk /nao_msgs/walk_action_server
-    - nao_actions/action_executor_kick kick /nao_msgs/kick_action_server
-    - nao_actions/action_executor_walkholding walkholding /nao_msgs/walkholding_action_server
-    - nao_actions/action_executor_turn turn /nao_msgs/turn_action_server
+    - nao_actions/action_executor_pickup pickup /nao_world_msgs/PickupActionServer
+    - nao_actions/action_executor_drop drop /nao_world_msgs/DropActionServer
+    - nao_actions/action_executor_walk walk /nao_world_msgs/WalkActionServer
+    - nao_actions/action_executor_kick kick /nao_world_msgs/KickActionServer
+    - nao_actions/action_executor_walkholding walkholding /nao_world_msgs/WalkHoldingActionServer
+    - nao_actions/action_executor_turn turn /nao_world_msgs/TurnActionServer

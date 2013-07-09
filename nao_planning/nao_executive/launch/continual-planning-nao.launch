@@ -8,12 +8,12 @@
 
     <rosparam command="load" ns="tfd_modules" file="$(find tfd_modules)/config/timeout_90s_5min_nontemporal.yaml" />
 
-    <node name= "kick_action_server" pkg= "nao_msgs" type= "kick_action_server"/>
-    <node name= "pickup_action_server" pkg= "nao_msgs" type= "pickup_action_server"/>
-    <node name= "drop_action_server" pkg= "nao_msgs" type= "drop_action_server"/>
-    <node name= "walk_action_server" pkg= "nao_msgs" type= "walk_action_server"/>
-    <node name= "walkholding_action_server" pkg= "nao_msgs" type= "walkholding_action_server"/>
-    <node name= "turn_action_server" pkg= "nao_msgs" type= "turn_action_server"/>
+    <node name= "KickActionServer" pkg= "nao_world_msgs" type= "kick_action_server.py"/>
+    <node name= "PickupActionServer" pkg= "nao_world_msgs" type= "pickup_action_server.py"/>
+    <node name= "DropActionServer" pkg= "nao_world_msgs" type= "drop_action_server.py"/>
+    <node name= "WalkActionServer" pkg= "nao_world_msgs" type= "walk_action_server.py"/>
+    <node name= "WalkHoldingActionServer" pkg= "nao_world_msgs" type= "walk_holding_action_server.py"/>
+    <node name= "TurnActionServer" pkg= "nao_world_msgs" type= "turn_action_server.py"/>
     
     <!--<node name= "rviz" pkg= "rviz" type= "rviz"/>-->
 

@@ -8,8 +8,8 @@
 #include <sstream>
 #include <XmlRpcValue.h>
 #include <XmlRpcException.h>
-#include <nao_msgs/ObjectLocations.h>
-#include <nao_msgs/RobotLocation.h>
+#include <nao_world_msgs/ObjectLocations.h>
+#include <nao_world_msgs/RobotLocation.h>
 
 
 PLUGINLIB_DECLARE_CLASS(nao_actions, state_creator_robot_pose,
@@ -119,8 +119,8 @@ namespace nao_actions
 		
 		//call to service to get the current robot location
 		ros::NodeHandle node;
-		ros::ServiceClient client = node.serviceClient<nao_msgs::RobotLocation>("RobotLocation");
-		nao_msgs::RobotLocation srv;
+		ros::ServiceClient client = node.serviceClient<nao_world_msgs::RobotLocation>("RobotLocation");
+		nao_world_msgs::RobotLocation srv;
 		int robotLocX, robotLocY;
 		if(client.call(srv)){
 			robotPose= srv.response.robotLocation;
@@ -142,8 +142,8 @@ namespace nao_actions
 		}
 
 		//call to service to get the current positions of the balls and boxes
-		ros::ServiceClient objClient= node.serviceClient<nao_msgs::ObjectLocations>("ObjectLocations");
-		nao_msgs::ObjectLocations srv1;
+		ros::ServiceClient objClient= node.serviceClient<nao_world_msgs::ObjectLocations>("ObjectLocations");
+		nao_world_msgs::ObjectLocations srv1;
 		if(objClient.call(srv1)){
 			visualization_msgs::MarkerArray currBoxLocs= srv1.response.boxLocs;
 			visualization_msgs::MarkerArray currBallLocs= srv1.response.ballLocs;
@@ -295,8 +295,8 @@ namespace nao_actions
 /*
 
 	ros::NodeHandle node;
-	ros::ServiceClient client = node.serviceClient<nao_msgs::RobotLocation>("RobotLocation");
-	nao_msgs::RobotLocation srv;
+	ros::ServiceClient client = node.serviceClient<nao_world_msgs::RobotLocation>("RobotLocation");
+	nao_world_msgs::RobotLocation srv;
 	visualization_msgs::MarkerArray ma;
 	if(client.call(srv)){
 		visualization_msgs::Marker robLoc;
@@ -314,8 +314,8 @@ namespace nao_actions
 	}
 
 	//call to service to get the current positions of the balls and boxes
-	ros::ServiceClient objClient= node.serviceClient<nao_msgs::ObjectLocations>("ObjectLocations");
-	nao_msgs::ObjectLocations srv1;
+	ros::ServiceClient objClient= node.serviceClient<nao_world_msgs::ObjectLocations>("ObjectLocations");
+	nao_world_msgs::ObjectLocations srv1;
 	if(objClient.call(srv1)){
 		visualization_msgs::MarkerArray currBoxLocs= srv1.response.boxLocs;
 		visualization_msgs::MarkerArray currBallLocs= srv1.response.ballLocs;

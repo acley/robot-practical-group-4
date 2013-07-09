@@ -3,20 +3,20 @@
 
 #include "continual_planning_executive/actionExecutorActionlib.hpp"
 #include "continual_planning_executive/symbolicState.h"
-#include <nao_msgs/WalkHoldingAction.h>
+#include <nao_world_msgs/WalkHoldingAction.h>
 
 namespace nao_actions
 {
 
-    class ActionExecutorWalkHolding : public ActionExecutorActionlib<nao_msgs::WalkHoldingAction,
-                                                    nao_msgs::WalkHoldingGoal, nao_msgs::WalkHoldingResult>
+    class ActionExecutorWalkHolding : public ActionExecutorActionlib<nao_world_msgs::WalkHoldingAction,
+                                                    nao_world_msgs::WalkHoldingGoal, nao_world_msgs::WalkHoldingResult>
     {
         public:
-            virtual bool fillGoal(nao_msgs::WalkHoldingGoal & goal,
+            virtual bool fillGoal(nao_world_msgs::WalkHoldingGoal & goal,
                     const DurativeAction & a, const SymbolicState & current);
 
             virtual void updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-                    const nao_msgs::WalkHoldingResult & result,
+                    const nao_world_msgs::WalkHoldingResult & result,
                     const DurativeAction & a, SymbolicState & current);
     };
 

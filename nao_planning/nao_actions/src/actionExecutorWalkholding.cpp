@@ -8,7 +8,7 @@ PLUGINLIB_DECLARE_CLASS(nao_actions, action_executor_walkholding,
 namespace nao_actions
 {
 
-    bool ActionExecutorWalkHolding::fillGoal(nao_msgs::WalkHoldingGoal & goal,
+    bool ActionExecutorWalkHolding::fillGoal(nao_world_msgs::WalkHoldingGoal & goal,
             const DurativeAction & a, const SymbolicState & current)
     {
         ROS_ASSERT(a.parameters.size() == 4);
@@ -25,7 +25,7 @@ namespace nao_actions
     }
 
     void ActionExecutorWalkHolding::updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-            const nao_msgs::WalkHoldingResult & result,
+            const nao_world_msgs::WalkHoldingResult & result,
             const DurativeAction & a, SymbolicState & current)
     {
         ROS_INFO("WalkHolding returned result");

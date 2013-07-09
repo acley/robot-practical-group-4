@@ -3,20 +3,20 @@
 
 #include "continual_planning_executive/actionExecutorActionlib.hpp"
 #include "continual_planning_executive/symbolicState.h"
-#include <nao_msgs/DropAction.h>
+#include <nao_world_msgs/DropAction.h>
 
 namespace nao_actions
 {
 
-    class ActionExecutorDrop : public ActionExecutorActionlib<nao_msgs::DropAction,
-                                                    nao_msgs::DropGoal, nao_msgs::DropResult>
+    class ActionExecutorDrop : public ActionExecutorActionlib<nao_world_msgs::DropAction,
+                                                    nao_world_msgs::DropGoal, nao_world_msgs::DropResult>
     {
         public:
-            virtual bool fillGoal(nao_msgs::DropGoal & goal,
+            virtual bool fillGoal(nao_world_msgs::DropGoal & goal,
                     const DurativeAction & a, const SymbolicState & current);
 
             virtual void updateState(const actionlib::SimpleClientGoalState & actionReturnState,
-                    const nao_msgs::DropResult & result,
+                    const nao_world_msgs::DropResult & result,
                     const DurativeAction & a, SymbolicState & current);
     };
 
