@@ -1,0 +1,19 @@
+<package>
+  <description brief="nao_world_msgs">
+
+     nao_world_msgs
+
+  </description>
+  <author>Noha</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/nao_world_msgs</url>
+  <depend package="geometry_msgs"/>
+  <depend package="visualization_msgs"/>
+  <depend package="actionlib_msgs"/> 
+  <depend package="actionlib"/>
+  <depend package="rospy"/>
+
+</package>
+
+
