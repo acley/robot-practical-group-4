@@ -1,0 +1,59 @@
+<launch>
+
+  <include file="$(find nao_localization)/launch/octomap_lab.launch" />
+  
+   <arg name="initial_pose_x" default="2.0" />
+   <arg name="initial_pose_y" default="2.0" />
+   <arg name="initial_pose_z" default="0.31" />
+   <arg name="initial_pose_roll" default="0.0" />
+   <arg name="initial_pose_pitch" default="0.0" />
+   <arg name="initial_pose_yaw" default="4.71" />
+
+  
+	<node pkg="humanoid_localization" type="localization_node" name="nao_localization" output="screen" >
+		<rosparam file="$(find nao_xtion)/config/localization_conf.yaml" command="load" />
+
+                <param name="initial_pose_x" value="$(arg initial_pose_x)" />
+                <param name="initial_pose_y" value="$(arg initial_pose_y)" />
+                <param name="initial_pose_z" value="$(arg initial_pose_z)" />
+                <param name="initial_pose_roll" value="$(arg initial_pose_roll)" />
+                <param name="initial_pose_pitch" value="$(arg initial_pose_pitch)" />
+                <param name="initial_pose_yaw" value="$(arg initial_pose_yaw)" />
+                <param name="use_imu" value="true" />
+                <param name="filter_ground" value="true" />
+                <param name="ground_filter/num_ground_points" value="20" /> <!-- was 20 -->
+                <param name="ground_filter/num_non_ground_points" value="80" /> <!-- was 80 -->
+                <!--
+                <param name="motion_noise/x" value="0.6" />
+                <param name="motion_noise/y" value="0.3" />
+                <param name="motion_noise/Y" value="1.5" />
+                <param name="motion_noise/R" value="0.01" />
+                <param name="motion_noise/P" value="0.01" />
+                  -->
+                <param name="temporal_sampling_range" value="0.0" /> <!-- was 0.0 -->
+                <param name="num_particles" value="500" /> <!-- was 500 -->
+                <!--
+                <param name="num_particles" value="1000" />
+                <param name="init_global" value="false" />
+                <param name="laser_z_hit" value="0.8" />
+                <param name="laser_z_rand" value="0.05" />
+                <param name="laser_sigma_hit" value="0.05" />
+                -->
+<!--
+                <param name="num_particles" value="500000" />
+                <param name="init_global" value="true" />
+                <param name="laser_z_hit" value="0.8" />
+                <param name="laser_z_rand" value="0.1" />
+                <param name="laser_sigma_hit" value="0.1" />
+-->
+                <!--
+                <param name="laser_z_hit" value="0.6" />
+                   <param name="laser_z_short" value="0.0" />
+                   <param name="laser_z_max" value="0.05" />
+                   <param name="laser_z_rand" value="0.05" />
+                   <param name="laser_sigma_hit" value="0.05" />
+                   <param name="laser_lambda_short" value="0.1" />
+                   -->
+	        <remap from="/point_cloud" to="/xtion/depth_registered/points" />
+	</node>
+</launch>
