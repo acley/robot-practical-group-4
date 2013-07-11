@@ -13,6 +13,9 @@
   <depend package="actionlib_msgs"/> 
   <depend package="actionlib"/>
   <depend package="rospy"/>
+  <depend package="sensor_msgs"/>
+  <depend package="pcl"/>
+  <depend package="pcl_ros"/>  
 
 </package>
 

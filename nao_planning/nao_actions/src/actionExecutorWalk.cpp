@@ -42,8 +42,8 @@ namespace nao_actions
 		current.setBooleanPredicate("at", robot + " " + loc_to, true);
 		current.setBooleanPredicate("clear", loc_from, true);
 
-		ros::NodeHandle nhPriv("~");
-		nhPriv.setParam("robotLoc", loc_to);
+		/*ros::NodeHandle nhPriv("~");
+		nhPriv.setParam("robotLoc", loc_to);*/
 		
        }
     }

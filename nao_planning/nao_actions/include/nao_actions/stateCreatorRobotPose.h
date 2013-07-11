@@ -6,6 +6,9 @@
 #include <tf/transform_listener.h>
 #include <ros/ros.h>
 #include <visualization_msgs/MarkerArray.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <nao_world_msgs/ObjectLocations.h>
+#include <nao_world_msgs/RobotLocation.h>
 
 namespace nao_actions 
 {

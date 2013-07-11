@@ -8,8 +8,6 @@
 #include <sstream>
 #include <XmlRpcValue.h>
 #include <XmlRpcException.h>
-#include <nao_world_msgs/ObjectLocations.h>
-#include <nao_world_msgs/RobotLocation.h>
 
 
 PLUGINLIB_DECLARE_CLASS(nao_actions, state_creator_robot_pose,
@@ -17,6 +15,8 @@ PLUGINLIB_DECLARE_CLASS(nao_actions, state_creator_robot_pose,
 
 namespace nao_actions
 {
+
+    nao_world_msgs::ObjectLocations getObjLocsSrv;
 
     StateCreatorRobotPose::StateCreatorRobotPose()
     {
@@ -179,14 +179,17 @@ namespace nao_actions
 
         }
 
-	
+    void color_detection(const sensor_msgs::PointCloud2ConstPtr& cloud){
+		getObjLocsSrv.request.cloud= *cloud;
+
+   	    }
        
     /**
      * Publishes locations for boxes, balls and the robot
      */
     void StateCreatorRobotPose::publishLocationsAsMarkers(const SymbolicState & state)
     {
-	ros::NodeHandle nhPriv("~");
+	/*ros::NodeHandle nhPriv("~");
 	nhPriv.getParam("robotLoc", robotLoc);
 	robotLoc= robotLoc.substr(4);
 	int index= robotLoc.find("-");
@@ -291,7 +294,9 @@ namespace nao_actions
 		ball.color.a= 1.0;
 		ma.markers.push_back(ball);
 	}
+*/
 
+	visualization_msgs::MarkerArray ma;
 /*
 
 	ros::NodeHandle node;
@@ -312,13 +317,15 @@ namespace nao_actions
 		ROS_ERROR("Cannot extract current robot location");
 		return;
 	}
-
+*/
 	//call to service to get the current positions of the balls and boxes
+	ros::NodeHandle node;
 	ros::ServiceClient objClient= node.serviceClient<nao_world_msgs::ObjectLocations>("ObjectLocations");
-	nao_world_msgs::ObjectLocations srv1;
-	if(objClient.call(srv1)){
-		visualization_msgs::MarkerArray currBoxLocs= srv1.response.boxLocs;
-		visualization_msgs::MarkerArray currBallLocs= srv1.response.ballLocs;
+	//subscribe to the camera images
+	ros::Subscriber cameraImg= node.subscribe("/xtion/depth_registered/points", 1, color_detection);
+	if(objClient.call(getObjLocsSrv)){
+		visualization_msgs::MarkerArray currBoxLocs= getObjLocsSrv.response.boxLocs;
+		visualization_msgs::MarkerArray currBallLocs= getObjLocsSrv.response.ballLocs;
 		for(int i=0; i<currBoxLocs.markers.size(); i++){
 			ma.markers.push_back(currBoxLocs.markers[i]);
 		}
@@ -330,7 +337,7 @@ namespace nao_actions
 	else{
 		ROS_ERROR("Cannot extract object locations");
 		return;
-	}*/
+	}
 
 	_markerPub.publish(ma);
     }

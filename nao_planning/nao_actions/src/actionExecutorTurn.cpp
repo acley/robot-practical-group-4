@@ -39,8 +39,8 @@ namespace nao_actions
 		current.setBooleanPredicate("Orientation", robot + " " + dir_from, false);
 		current.setBooleanPredicate("Orientation", robot + " " + dir_to, true);		
 
-		ros::NodeHandle nhPriv("~");
-		nhPriv.setParam("robotDir", dir_to);
+		/*ros::NodeHandle nhPriv("~");
+		nhPriv.setParam("robotDir", dir_to);*/
 		
        }
     }

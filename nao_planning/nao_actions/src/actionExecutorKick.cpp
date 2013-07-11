@@ -51,7 +51,7 @@ namespace nao_actions
 		current.setBooleanPredicate("clear", loc_3, false);
 		current.setBooleanPredicate("clear", loc_2, true);
 
-		ros::NodeHandle nhPriv("~");
+		/*ros::NodeHandle nhPriv("~");
 		XmlRpc::XmlRpcValue ballLocs, balls;
 		nhPriv.getParam("ballLocs", ballLocs);
 		nhPriv.getParam("balls", balls);
@@ -64,7 +64,7 @@ namespace nao_actions
 				break;
 			}
 		}
-		nhPriv.setParam("ballLocs", ballLocs);
+		nhPriv.setParam("ballLocs", ballLocs);*/
 
         }
     }

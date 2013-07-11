@@ -46,7 +46,7 @@ namespace nao_actions
 		current.setBooleanPredicate("Holding", robot + " " + box, false);
 		current.setBooleanPredicate("clear", loc_2, false);	
 
-		ros::NodeHandle nhPriv("~");
+		/*ros::NodeHandle nhPriv("~");
 		XmlRpc::XmlRpcValue xmlBoxes, xmlBoxLocs;
 		nhPriv.getParam("boxLocs", xmlBoxLocs);
 		nhPriv.getParam("boxes", xmlBoxes);
@@ -58,7 +58,7 @@ namespace nao_actions
 				break;
 			}
 		}
-		nhPriv.setParam("boxLocs", xmlBoxLocs);
+		nhPriv.setParam("boxLocs", xmlBoxLocs);*/
         }
     }
 
