@@ -17,6 +17,7 @@ namespace nao_actions
 {
 
     nao_world_msgs::ObjectLocations getObjLocsSrv;
+    SymbolicState currentState;
 
     StateCreatorRobotPose::StateCreatorRobotPose()
     {
@@ -112,66 +113,104 @@ namespace nao_actions
 
         }
 
+	void color_detection(const sensor_msgs::PointCloud2ConstPtr& cloud){
+	getObjLocsSrv.request.cloud= *cloud;
+	ros::NodeHandle node;
+	ros::ServiceClient objClient= node.serviceClient<nao_world_msgs::ObjectLocations>("ObjectLocations");
+	ros::Publisher _markerPub = node.advertise<visualization_msgs::MarkerArray>("objects", 1000);
+	
+	visualization_msgs::MarkerArray ma;
+
+	if(objClient.call(getObjLocsSrv)){
+		visualization_msgs::MarkerArray currBoxLocs= getObjLocsSrv.response.boxLocs;
+		visualization_msgs::MarkerArray currBallLocs= getObjLocsSrv.response.ballLocs;
+		for(int i=0; i<currBoxLocs.markers.size(); i++){
+	  		ma.markers.push_back(currBoxLocs.markers[i]);
+		}
+
+		for(int i=0; i<currBallLocs.markers.size(); i++){
+			ma.markers.push_back(currBallLocs.markers[i]);
+		}
+		
+
+		for(int i=0; i<getObjLocsSrv.response.boxes.size(); i++){
+			std::stringstream currLoc;
+			currLoc << "box" << i << " pos-" << getObjLocsSrv.response.boxes[i].x 
+				<< "-" << getObjLocsSrv.response.boxes[i].y;
+			currentState.setBooleanPredicate("at", currLoc.str(), true);
+			
+		}
+
+		for(int i=0; i<getObjLocsSrv.response.balls.size(); i++){
+			std::stringstream currLoc;
+			currLoc << "ball" << i << " pos-" << getObjLocsSrv.response.balls[i].x 
+				<< "-" << getObjLocsSrv.response.balls[i].y;
+			currentState.setBooleanPredicate("at", currLoc.str(), true);
+			
+		}
+		
+
+
+	}
+
+	_markerPub.publish(ma);	
+
+
+   	}
+
+
+
 	//sets the current location for the robot and the observed objects
         bool StateCreatorRobotPose::fillState(SymbolicState & state)
         {
-		/*geometry_msgs::PoseStamped robotPose;
-		
-		//call to service to get the current robot location
+		//call service to set robot location
 		ros::NodeHandle node;
-		ros::ServiceClient client = node.serviceClient<nao_world_msgs::RobotLocation>("RobotLocation");
-		nao_world_msgs::RobotLocation srv;
-		int robotLocX, robotLocY;
-		if(client.call(srv)){
-			robotPose= srv.response.robotLocation;
-			robotLocX= robotPose.pose.position.x/cell_size+1;
-			robotLocY= robotPose.pose.position.y/cell_size+1;
-			std::stringstream ss;
-			ss << "pos-" << robotLocX << "-" << robotLocY;
-			robotLoc= ss.str();
-			std::vector<std::string> atPredicate;
-			atPredicate.push_back("robot");
-			atPredicate.push_back(robotLoc);
-			//setting the current robot location
-			state.setBooleanPredicate("at", atPredicate, true);
-			state.setBooleanPredicate("clear", robotLoc, false);
-		}
-		else{
-			ROS_ERROR("Cannot extract current robot location");
-			return false;
-		}
+		ros::ServiceClient robotClient= node.serviceClient<nao_world_msgs::RobotLocation>("RobotLocation");
+		nao_world_msgs::RobotLocation getRobotLocsSrv;
+		if(robotClient.call(getRobotLocsSrv)){
+			std::stringstream currLoc;
+			currLoc << "pos-" << getRobotLocsSrv.response.robot_grid_cell.x 
+				<< "-" << getRobotLocsSrv.response.robot_grid_cell.y;
+			state.setBooleanPredicate("robotLoc", currLoc.str(), true);
+			
+			geometry_msgs::Quaternion robotOrientation= getRobotLocsSrv.response.robotLocation.pose.orientation;
+			 // the incoming geometry_msgs::Quaternion is transformed to a tf::Quaterion
+			tf::Quaternion quat;
+			tf::quaternionMsgToTF(robotOrientation, quat);
 
-		//call to service to get the current positions of the balls and boxes
-		ros::ServiceClient objClient= node.serviceClient<nao_world_msgs::ObjectLocations>("ObjectLocations");
-		nao_world_msgs::ObjectLocations srv1;
-		if(objClient.call(srv1)){
-			visualization_msgs::MarkerArray currBoxLocs= srv1.response.boxLocs;
-			visualization_msgs::MarkerArray currBallLocs= srv1.response.ballLocs;
-			for(int i=0; i<currBoxLocs.markers.size(); i++){
-				std::stringstream ss;
-				ss << "pos-" << currBoxLocs.markers[i].pose.position.x/cell_size+1 << "-" << currBoxLocs.markers[i].pose.position.y/cell_size+1;
-				std::vector<std::string> atPredicate;
-				atPredicate.push_back(currBoxLocs.markers[i].ns);
-				atPredicate.push_back(ss.str());
-				state.setBooleanPredicate("at", atPredicate, true);
-				state.setBooleanPredicate("clear", ss.str(), false);
+			// the tf::Quaternion has a method to acess roll pitch and yaw
+			double roll, pitch, yaw;
+			tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
+			
+			string orientation= "dir-";
+			if(yaw>=0 && yaw<M_PI/2){
+				orientation+="north";
 			}
-			for(int i=0; i<currBallLocs.markers.size(); i++){
-				std::stringstream ss;
-				ss << "pos-" << currBallLocs.markers[i].pose.position.x/cell_size+1 << "-" << currBallLocs.markers[i].pose.position.y/cell_size+1;
-				std::vector<std::string> atPredicate;
-				atPredicate.push_back(currBallLocs.markers[i].ns);
-				atPredicate.push_back(ss.str());
-				state.setBooleanPredicate("at", atPredicate, true);
-				state.setBooleanPredicate("clear", ss.str(), false);
+			if(yaw>=M_PI/2 && yaw<M_PI){
+				orientation+= "east";
+			}
+			if(yaw>=M_PI && yaw<(1.5*M_PI)){
+				orientation+= "south";
+			}
+			if(yaw>=(1.5*M_PI) && yaw<(2*M_PI)){
+				orientation+= "west";
 			}
 
+			state.setBooleanPredicate("robotDir", orientation, true);
+
+			ROS_INFO("robot location updated successfully");
 		}
-		else{
-			ROS_ERROR("Cannot extract object locations");
-			return false;
+		else{	
+			ROS_INFO("failed to call service RobotLocation");
 		}
-		*/
+
+		currentState= state;
+
+		//call service to get object locations
+		ros::Subscriber cameraImg= node.subscribe("/xtion/depth_registered/points", 1, color_detection);
+		
+
+
 		if(s_PublishLocationsAsMarkers)
                		publishLocationsAsMarkers(state);
 		return true;
@@ -179,10 +218,7 @@ namespace nao_actions
 
         }
 
-    void color_detection(const sensor_msgs::PointCloud2ConstPtr& cloud){
-		getObjLocsSrv.request.cloud= *cloud;
-
-   	    }
+    
        
     /**
      * Publishes locations for boxes, balls and the robot
@@ -318,27 +354,32 @@ namespace nao_actions
 		return;
 	}
 */
-	//call to service to get the current positions of the balls and boxes
+	
 	ros::NodeHandle node;
+	ros::ServiceClient robotClient= node.serviceClient<nao_world_msgs::RobotLocation>("RobotLocation");
+	nao_world_msgs::RobotLocation getRobotLocsSrv;
+	visualization_msgs::Marker robotLocMarker;
+	if(robotClient.call(getRobotLocsSrv)){
+		robotLocMarker.header.frame_id= getRobotLocsSrv.response.robotLocation.header.frame_id;
+	  	robotLocMarker.header.stamp= getRobotLocsSrv.response.robotLocation.header.stamp;
+		robotLocMarker.ns= "Robot";
+		robotLocMarker.id= 0;
+		robotLocMarker.pose= getRobotLocsSrv.response.robotLocation.pose;
+		robotLocMarker.type= visualization_msgs::Marker::ARROW;
+		robotLocMarker.action= visualization_msgs::Marker::ADD;
+		robotLocMarker.color.b= 1.0;
+		robotLocMarker.color.a= 1.0;
+
+		ma.markers.push_back(robotLocMarker);
+		_markerPub.publish(ma);	
+	}
+
+	//call to service to get the current positions of the balls and boxes
 	ros::ServiceClient objClient= node.serviceClient<nao_world_msgs::ObjectLocations>("ObjectLocations");
 	//subscribe to the camera images
 	ros::Subscriber cameraImg= node.subscribe("/xtion/depth_registered/points", 1, color_detection);
-	if(objClient.call(getObjLocsSrv)){
-		visualization_msgs::MarkerArray currBoxLocs= getObjLocsSrv.response.boxLocs;
-		visualization_msgs::MarkerArray currBallLocs= getObjLocsSrv.response.ballLocs;
-		for(int i=0; i<currBoxLocs.markers.size(); i++){
-			ma.markers.push_back(currBoxLocs.markers[i]);
-		}
-		for(int i=0; i<currBallLocs.markers.size(); i++){
-			ma.markers.push_back(currBallLocs.markers[i]);
-		}
-	}
-	else{
-		ROS_ERROR("Cannot extract object locations");
-		return;
-	}
 
-	_markerPub.publish(ma);
+
     }
 
 };

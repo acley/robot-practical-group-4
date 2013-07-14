@@ -60,7 +60,6 @@ namespace nao_actions
             static const bool s_PublishMeshMarkers = true;
 
             ros::Publisher _markerPub;
-
             std::string _robotPoseObject;   ///< the name of the robot pose's object (e.g. robot_pose, or l0)
             std::string _robotPoseType;     ///< the type of the _robotPoseObject - required if _robotPoseObject.
             std::string _atPredicate;       ///< the name of the "at" predicate (e.g. at-base)
