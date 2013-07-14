@@ -16,11 +16,30 @@ namespace nao_actions
         string dir_from = a.parameters[1];
         string dir_to = a.parameters[2];
         
+        goal.theta = extractTargetOrientation(a);
+        
         // set corresponding WalkGoal parameters
         // i.e.: goal.<fieldName> = <value>;
         // i.e.: goal.<fieldName> = a.parameters[...];
 
         return true;
+    }
+    
+    double extractTargetOrientation(const DurativeAction & a)
+    {        
+        double angles[4][4] = {{0, M_PI/2, M_PI, M_PI * 1.5},
+                                {-M_PI/2, 0, M_PI/2, M_PI},
+                                {-M_PI, -M_PI/2, 0, M_PI/2},
+                                {-M_PI * 1.5, -M_PI, -M_PI/2, 0}};
+                                
+        string dir_from = a.parameters[1];
+        string dir_to = a.parameters[2];
+       
+        string directions[4] = {"dir-north", "dir-east", "dir-south", "dir-west"};
+        int from_index = std::distance(directions, std::find(directions, directions+4, dir_from));
+        int to_index = std::distance(directions, std::find(directions, directions+4, dir_to));
+        
+        return angles[from_index][to_index];
     }
 
 

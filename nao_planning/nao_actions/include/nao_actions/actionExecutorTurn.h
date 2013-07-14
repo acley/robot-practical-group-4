@@ -4,6 +4,9 @@
 #include "continual_planning_executive/actionExecutorActionlib.hpp"
 #include "continual_planning_executive/symbolicState.h"
 #include <nao_world_msgs/TurnAction.h>
+#include <math.h>
+#include <algorithm>
+
 
 namespace nao_actions
 {
@@ -18,6 +21,8 @@ namespace nao_actions
             virtual void updateState(const actionlib::SimpleClientGoalState & actionReturnState,
                     const nao_world_msgs::TurnResult & result,
                     const DurativeAction & a, SymbolicState & current);
+                    
+            double extractTargetOrientation(const DurativeAction & a);
     };
 
 };

@@ -18,13 +18,13 @@ class TurnActionServer:
 
   def execute(self, goal):
     # Do lots of awesome groundbreaking robot stuff here
-    #self.turn()
+    self.turn(goal.theta)
     self.server.set_succeeded()
     
-  def turn(self):
+  def turn(self, goal):
     # Init proxies.
     try:
-        motionProxy = ALProxy("ALMotion", "192.168.105.14", 9559)
+        motionProxy = ALProxy("ALMotion", "192.168.105.15", 9559)
     except Exception, e:
         print "Could not create proxy to ALMotion"
         print "Error was: ", e
@@ -103,7 +103,7 @@ class TurnActionServer:
 
     gait_config = [["MaxStepX", 0.04], ["MaxStepY", 0.14], ["MaxStepTheta", 0.35], ["MaxStepFrequency", 0.5], ["StepHeight", 0.019999999552965164], ["TorsoWx", 0.0], ["TorsoWy", -0.5]]
 
-    motionProxy.walkTo(0, 0, math.pi/2, gait_config)
+    motionProxy.walkTo(0, 0, goal.theta, gait_config)
     
   def StiffnessOn(self, proxy):
     # We use the "Body" name to signify the collection of all joints

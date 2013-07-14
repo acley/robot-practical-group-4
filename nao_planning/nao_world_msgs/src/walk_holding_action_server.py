@@ -18,7 +18,7 @@ class WalkHoldingActionServer:
 
   def execute(self, goal):
     # Do lots of awesome groundbreaking robot stuff here
-    #self.walk()
+    self.walk(goal)
     self.server.set_succeeded()
     
   def walk(self):
@@ -102,7 +102,7 @@ class WalkHoldingActionServer:
 
     gait_config = [["MaxStepX", 0.04], ["MaxStepY", 0.14], ["MaxStepTheta", 0.35], ["MaxStepFrequency", 0.5], ["StepHeight", 0.019999999552965164], ["TorsoWx", 0.0], ["TorsoWy", -0.5]]
 
-    motionProxy.walkTo(0.3, 0, 0, gait_config)
+    motionProxy.walkTo(goal.distance, 0, 0, gait_config)
     
   def StiffnessOn(self, proxy):
     # We use the "Body" name to signify the collection of all joints

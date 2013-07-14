@@ -332,7 +332,6 @@ namespace nao_actions
 		for(int i=0; i<currBallLocs.markers.size(); i++){
 			ma.markers.push_back(currBallLocs.markers[i]);
 		}
-
 	}
 	else{
 		ROS_ERROR("Cannot extract object locations");

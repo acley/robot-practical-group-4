@@ -17,6 +17,16 @@ namespace nao_actions
         string loc_to = a.parameters[2];
         string direction = a.parameters[3];
         
+        // extract coordinates from loc_to
+        /*string x_pos= loc_to.substr(loc_to.find("-")+1);
+        goal.x_loc= str2num(x_pos.substr(0,x_pos.find("-")));
+        goal.y_loc= str2num(x_pos.substr(x_pos.find("-")+1));*/
+        
+      ros::NodeHandle nhPriv("~");
+      double cell_size;
+      nhPriv.getParam("cell_size", cell_size);
+      goal.distance = cell_size;
+        
         // set corresponding WalkGoal parameters
         // i.e.: goal.<fieldName> = <value>;
         // i.e.: goal.<fieldName> = a.parameters[...];
