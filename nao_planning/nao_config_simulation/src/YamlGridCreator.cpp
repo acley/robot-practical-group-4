@@ -11,7 +11,7 @@ int main()
   int number_of_rows = 15;
   
   for (int r=1; r<=number_of_rows; r++) {
-    for (int c=1; c<=number_of_columns; c++) {
+    for (int c=2; c<=number_of_columns-1; c++) {
       std::stringstream cell;
       cell << "- \"pos-" << r << "-" << c << " ";
       
@@ -30,14 +30,14 @@ int main()
       }
       
       // west
-      if (c>1) {
+      if (c>2) {
         std::stringstream west;
         west << "pos-" << r << "-" << (c-1) << " dir-west\"";
         myfile << cell.str() << west.str() << std::endl;
       }
       
       // east
-      if (c<number_of_columns) {
+      if (c<number_of_columns-1) {
         std::stringstream east;
         east << "pos-" << r << "-" << (c+1) << " dir-east\"";
         myfile << cell.str() << east.str() << std::endl;

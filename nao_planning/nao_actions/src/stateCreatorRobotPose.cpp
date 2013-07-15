@@ -171,10 +171,10 @@ namespace nao_actions
 		nao_world_msgs::RobotLocation getRobotLocsSrv;
 		if(robotClient.call(getRobotLocsSrv)){
 			std::stringstream currLoc, currLoc1;
-			currLoc << "robot " << "pos-" << getRobotLocsSrv.response.robot_grid_cell.x 
-				<< "-" << getRobotLocsSrv.response.robot_grid_cell.y;
-		  currLoc1 << "pos-" << getRobotLocsSrv.response.robot_grid_cell.x 
-				<< "-" << getRobotLocsSrv.response.robot_grid_cell.y;
+			currLoc << "robot " << "pos-" << getRobotLocsSrv.response.robot_grid_cell.y 
+				<< "-" << getRobotLocsSrv.response.robot_grid_cell.x;
+		  currLoc1 << "pos-" << getRobotLocsSrv.response.robot_grid_cell.y 
+				<< "-" << getRobotLocsSrv.response.robot_grid_cell.x;
 			state.setBooleanPredicate("at", currLoc.str(), true);
 			state.setBooleanPredicate("clear", currLoc1.str(), false);
 			

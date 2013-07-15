@@ -103,7 +103,7 @@ class WalkActionServer:
 
     gait_config = [["MaxStepX", 0.04], ["MaxStepY", 0.14], ["MaxStepTheta", 0.35], ["MaxStepFrequency", 0.5], ["StepHeight", 0.019999999552965164]]#, ["TorsoWx", 0.0], ["TorsoWy", -0.5]]
     
-    motionProxy.walkTo(goal.distance, 0, 0, gait_config)
+    motionProxy.walkTo(goal.distance, 0, -0.122, gait_config)
     rospy.loginfo("walking.")
     
   def StiffnessOn(self, proxy):
