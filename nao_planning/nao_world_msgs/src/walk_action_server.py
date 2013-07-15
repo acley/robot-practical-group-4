@@ -12,12 +12,13 @@ from nao_world_msgs.msg import *
 
 class WalkActionServer:
   def __init__(self):
-    self.server = actionlib.SimpleActionServer('/nao_world_msgs/WalkActionServer', WalkAction, self.execute, False)
+    self.server = actionlib.SimpleActionServer('/nao_world_msgs/walk_action_server', WalkAction, self.execute, False)
     self.server.start()
     rospy.loginfo("Walk Action Server started.")
 
-  def execute(self, goal):
+  def execute(self,goal):
     # Do lots of awesome groundbreaking robot stuff here
+    rospy.loginfo("Walk Action Request Received")
     self.walk(goal)
     self.server.set_succeeded()
     
@@ -100,9 +101,10 @@ class WalkActionServer:
     #####################
     motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", True]])
 
-    gait_config = [["MaxStepX", 0.04], ["MaxStepY", 0.14], ["MaxStepTheta", 0.35], ["MaxStepFrequency", 0.5], ["StepHeight", 0.019999999552965164], ["TorsoWx", 0.0], ["TorsoWy", -0.5]]
-
+    gait_config = [["MaxStepX", 0.04], ["MaxStepY", 0.14], ["MaxStepTheta", 0.35], ["MaxStepFrequency", 0.5], ["StepHeight", 0.019999999552965164]]#, ["TorsoWx", 0.0], ["TorsoWy", -0.5]]
+    
     motionProxy.walkTo(goal.distance, 0, 0, gait_config)
+    rospy.loginfo("walking.")
     
   def StiffnessOn(self, proxy):
     # We use the "Body" name to signify the collection of all joints
@@ -113,6 +115,6 @@ class WalkActionServer:
     proxy.setFallManagerEnabled(0)
     
 if __name__ == '__main__':
-  rospy.init_node('WalkActionServer')
+  rospy.init_node('walk_action_server')
   server = WalkActionServer()
   rospy.spin()

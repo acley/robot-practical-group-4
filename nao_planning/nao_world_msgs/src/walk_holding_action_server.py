@@ -12,7 +12,7 @@ from nao_world_msgs.msg import *
 
 class WalkHoldingActionServer:
   def __init__(self):
-    self.server = actionlib.SimpleActionServer('/nao_world_msgs/WalkHoldingActionServer', WalkHoldingAction, self.execute, False)
+    self.server = actionlib.SimpleActionServer('/nao_world_msgs/walkholding_action_server', WalkHoldingAction, self.execute, False)
     self.server.start()
     rospy.loginfo("Walk-Holding Action Server started.")
 
@@ -24,7 +24,7 @@ class WalkHoldingActionServer:
   def walk(self):
     # Init proxies.
     try:
-        motionProxy = ALProxy("ALMotion", "192.168.105.14", 9559)
+        motionProxy = ALProxy("ALMotion", "192.168.105.15", 9559)
     except Exception, e:
         print "Could not create proxy to ALMotion"
         print "Error was: ", e
@@ -113,6 +113,6 @@ class WalkHoldingActionServer:
     proxy.setFallManagerEnabled(0)
     
 if __name__ == '__main__':
-  rospy.init_node('WalkHoldingActionServer')
+  rospy.init_node('walkholding_action_server')
   server = WalkHoldingActionServer()
   rospy.spin()

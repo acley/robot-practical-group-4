@@ -8,13 +8,13 @@ from nao_world_msgs.msg import *
 
 class DropActionServer:
   def __init__(self):
-    self.server = actionlib.SimpleActionServer('/nao_world_msgs/DropActionServer', DropAction, self.execute, False)
+    self.server = actionlib.SimpleActionServer('/nao_world_msgs/drop_action_server', DropAction, self.execute, False)
     self.server.start()
     rospy.loginfo("Drop Action Server started.")
 
   def execute(self, goal):
     # Do lots of awesome groundbreaking robot stuff here
-    #self.drop()
+    self.drop()
     self.server.set_succeeded()
     
   def drop(self):
@@ -125,13 +125,13 @@ class DropActionServer:
 
     try:
       # uncomment the following line and modify the IP if you use this script outside Choregraphe.
-      motion = ALProxy("ALMotion", "192.168.105.14", 9559)
+      motion = ALProxy("ALMotion", "192.168.105.15", 9559)
       motion.stiffnessInterpolation("Body", 1.0, 0.1)
       motion.angleInterpolationBezier(names, times, keys);
     except BaseException, err:
       print err  
     
 if __name__ == '__main__':
-  rospy.init_node('DropActionServer')
+  rospy.init_node('drop_action_server')
   server = DropActionServer()
   rospy.spin()

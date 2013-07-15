@@ -138,6 +138,7 @@ namespace nao_actions
 			currLoc << "box" << i << " pos-" << getObjLocsSrv.response.boxes[i].x 
 				<< "-" << getObjLocsSrv.response.boxes[i].y;
 			currentState.setBooleanPredicate("at", currLoc.str(), true);
+			currentState.setBooleanPredicate("clear", currLoc.str(), false);
 			
 		}
 
@@ -146,6 +147,7 @@ namespace nao_actions
 			currLoc << "ball" << i << " pos-" << getObjLocsSrv.response.balls[i].x 
 				<< "-" << getObjLocsSrv.response.balls[i].y;
 			currentState.setBooleanPredicate("at", currLoc.str(), true);
+			currentState.setBooleanPredicate("clear", currLoc.str(), false);
 			
 		}
 		
@@ -168,10 +170,16 @@ namespace nao_actions
 		ros::ServiceClient robotClient= node.serviceClient<nao_world_msgs::RobotLocation>("RobotLocation");
 		nao_world_msgs::RobotLocation getRobotLocsSrv;
 		if(robotClient.call(getRobotLocsSrv)){
-			std::stringstream currLoc;
-			currLoc << "pos-" << getRobotLocsSrv.response.robot_grid_cell.x 
+			std::stringstream currLoc, currLoc1;
+			currLoc << "robot " << "pos-" << getRobotLocsSrv.response.robot_grid_cell.x 
 				<< "-" << getRobotLocsSrv.response.robot_grid_cell.y;
-			state.setBooleanPredicate("robotLoc", currLoc.str(), true);
+		  currLoc1 << "pos-" << getRobotLocsSrv.response.robot_grid_cell.x 
+				<< "-" << getRobotLocsSrv.response.robot_grid_cell.y;
+			state.setBooleanPredicate("at", currLoc.str(), true);
+			state.setBooleanPredicate("clear", currLoc1.str(), false);
+			
+			ROS_INFO("robot location now %d, %d", getRobotLocsSrv.response.robot_grid_cell.x, getRobotLocsSrv.response.robot_grid_cell.y);
+			
 			
 			geometry_msgs::Quaternion robotOrientation= getRobotLocsSrv.response.robotLocation.pose.orientation;
 			 // the incoming geometry_msgs::Quaternion is transformed to a tf::Quaterion
@@ -182,21 +190,23 @@ namespace nao_actions
 			double roll, pitch, yaw;
 			tf::Matrix3x3(quat).getRPY(roll, pitch, yaw);
 			
-			string orientation= "dir-";
-			if(yaw>=0 && yaw<M_PI/2){
-				orientation+="north";
+			string orientation= "robot dir-";
+			if(yaw<=0.785 && yaw>-0.785){//(yaw<=M_PI/4 && yaw>-1*M_PI/4){
+				orientation+="west";
 			}
-			if(yaw>=M_PI/2 && yaw<M_PI){
+			if(yaw<=-0.785 && yaw>-2.35){//(yaw<=-1*M_PI/4 && yaw>-3*M_PI/4){
+				orientation+= "north";
+			}
+			if(yaw<=-2.35 || yaw>2.35){//((yaw<=-3/4*M_PI && yaw>= -1*M_PI) || (yaw>(3/4*M_PI) && yaw <= M_PI)){
 				orientation+= "east";
 			}
-			if(yaw>=M_PI && yaw<(1.5*M_PI)){
+			if(yaw>=0.785 && yaw<2.35){//(yaw>=(M_PI/4) && yaw<(3/4*M_PI)){
 				orientation+= "south";
 			}
-			if(yaw>=(1.5*M_PI) && yaw<(2*M_PI)){
-				orientation+= "west";
-			}
+			
+			ROS_INFO("%f", yaw);
 
-			state.setBooleanPredicate("robotDir", orientation, true);
+			state.setBooleanPredicate("Orientation", orientation, true);
 
 			ROS_INFO("robot location updated successfully");
 		}

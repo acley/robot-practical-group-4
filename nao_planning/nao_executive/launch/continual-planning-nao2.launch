@@ -8,14 +8,16 @@
 
     <rosparam command="load" ns="tfd_modules" file="$(find tfd_modules)/config/timeout_90s_5min_nontemporal.yaml" />
 
-    <node name= "kick_action_server" pkg= "nao_world_msgs" type= "kick_action_server"/>
-    <node name= "pickup_action_server" pkg= "nao_world_msgs" type= "pickup_action_server"/>
-    <node name= "drop_action_server" pkg= "nao_world_msgs" type= "drop_action_server"/>
-    <node name= "walk_action_server" pkg= "nao_world_msgs" type= "walk_action_server"/>
-    <node name= "walkholding_action_server" pkg= "nao_world_msgs" type= "walkholding_action_server"/>
-    <node name= "turn_action_server" pkg= "nao_world_msgs" type= "turn_action_server"/>
+    <node name= "KickActionServer" pkg= "nao_world_msgs" type= "kick_action_server.py"/>
+    <node name= "PickupActionServer" pkg= "nao_world_msgs" type= "pickup_action_server.py"/>
+    <node name= "DropActionServer" pkg= "nao_world_msgs" type= "drop_action_server.py"/>
+    <node name= "WalkActionServer" pkg= "nao_world_msgs" type= "walk_action_server.py"/>
+    <node name= "WalkHoldingActionServer" pkg= "nao_world_msgs" type= "walk_holding_action_server.py"/>
+    <node name= "TurnActionServer" pkg= "nao_world_msgs" type= "turn_action_server.py"/>
+    <node name= "get_object_locations" pkg= "nao_world_msgs" type= "get_object_locs"/>
+    <node name= "get_robot_location" pkg= "nao_world_msgs" type= "get_robot_loc"/>
     
-    <node name= "rviz" pkg= "rviz" type= "rviz"/>
+    <!--<node name= "rviz" pkg= "rviz" type= "rviz"/>-->
 
 
     <!-- start executive -->
@@ -23,8 +25,9 @@
         <param name="start_paused" value="$(arg paused)" />
         <param name="domain_file" value="$(find nao_domains)/nao-world/nao-world.pddl" />
 
-        <rosparam command="load" file="$(arg config_pkg)/config/planning/$(arg map_suffix)_actions.yaml" />
-	<rosparam command="load" file="$(arg config_pkg)/config/planning/map2.yaml" />
+        <!--<rosparam command="load" file="$(arg config_pkg)/config/planning/$(arg map_suffix)_actions.yaml" />-->
+        <rosparam command="load" file="nao_config_simulation/config/planning/nao_actions.yaml" />
+	      <rosparam command="load" file="$(arg config_pkg)/config/planning/map2.yaml" />
         <rosparam command="load" file="$(find tfd_modules)/config/tfdm_interface.yaml" />
         <!-- navstack_init "fixed_frame" "goal_tolerance used in planner requests" 
              "goal_tolerance is relative to move_base's xy_goal_tolerance either

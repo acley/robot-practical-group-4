@@ -44,24 +44,6 @@ int main(int argc, char **argv)
 	
 	visualization_msgs::MarkerArray ma;
 	
-	/*if(objClient.call(getObjLocsSrv)){
-		visualization_msgs::MarkerArray currBoxLocs= getObjLocsSrv.response.boxLocs;
-		visualization_msgs::MarkerArray currBallLocs= getObjLocsSrv.response.ballLocs;
-		for(int i=0; i<currBoxLocs.markers.size(); i++){
-			ma.markers.push_back(currBoxLocs.markers[i]);
-		}
-			
-		for(int i=0; i<currBallLocs.markers.size(); i++){
-		  ma.markers.push_back(currBallLocs.markers[i]);
-		}
-	}
-	else{
-		ROS_ERROR("Cannot extract object locations");
-		return 0;
-	}
-
-	_markerPub.publish(ma);*/
-	
 	ros::spin();
 	
   return 0;

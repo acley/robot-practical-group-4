@@ -56,9 +56,7 @@ int main(int argc, char **argv)
 
 using namespace std;
 
-//ros::Publisher marker_pub;
 ros::Publisher pub;
-//ros::Publisher pub_ball;
 struct coordinate
 {
       float x;
@@ -66,23 +64,14 @@ struct coordinate
       float z;
 };
 
-void calculateGridCellID(std::vector<float> & x_locs, std::vector<float> & y_locs)
-{
-    for (int i=0; (int) i<x_locs.size(); i++) {
-        
-    }
-}
-
 bool
 color_detection (nao_world_msgs::ObjectLocations::Request  &req,
-         nao_world_msgs::ObjectLocations::Response &res)//const sensor_msgs::PointCloud2ConstPtr& cloud)
+         nao_world_msgs::ObjectLocations::Response &res)
 {
   pcl::PointCloud<pcl::PointXYZRGB> cloud_p;
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl_unfiltered (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::PointCloud<pcl::PointXYZHSV> cloud_pcl_hsv;
- // sensor_msgs::PointCloud2 output;
- // sensor_msgs::PointCloud2 output_ball;
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl_boxes (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl_balls (new pcl::PointCloud<pcl::PointXYZRGB>);
   pcl::fromROSMsg(req.cloud,*cloud_pcl_unfiltered);
@@ -96,13 +85,11 @@ color_detection (nao_world_msgs::ObjectLocations::Request  &req,
   pcl::PointCloudXYZRGBtoXYZHSV (*cloud_pcl, cloud_pcl_hsv);
 
 
-  //uint32_t shape = visualization_msgs::Marker::ARROW;
-  //visualization_msgs::Marker box_marker[2],ball_marker[2];
+  // extract red and green pixels
   for(size_t i = 0; i < cloud_pcl_hsv.size(); i++)
-  {  //                             12                              253                            0.75
+  {
       if(((cloud_pcl_hsv.at(i).h < 12) || (cloud_pcl_hsv.at(i).h > 253) )  && (cloud_pcl_hsv.at(i).s > 0.75) && (cloud_pcl_hsv.at(i).v > 30))
       {
-          //std::cout<<"Punkt"<<std::endl;
           cloud_pcl_boxes->points.push_back(cloud_pcl->points[i]);
       }
       if(((cloud_pcl_hsv.at(i).h < 90) && (cloud_pcl_hsv.at(i).h > 50) )  && (cloud_pcl_hsv.at(i).s > 0.5) && (cloud_pcl_hsv.at(i).s < 1) && (cloud_pcl_hsv.at(i).v > 50))
@@ -122,27 +109,17 @@ color_detection (nao_world_msgs::ObjectLocations::Request  &req,
   ec.setSearchMethod (tree);
   ec.setInputCloud (cloud_pcl_boxes);
   ec.extract (cluster_indices);
+  
   std::vector<pcl::PointIndices>::const_iterator it;
-
   std::vector<int>::const_iterator pit;
-  //uint8_t r = 255, g = 255, b = 255;
 
-  //uint32_t rgb;
   std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr > cluster_box;
-  //pcl::PointCloud<pcl::PointXYZRGB>::Ptr cluster_boxes (new pcl::PointCloud<pcl::PointXYZRGB>);
   for(it = cluster_indices.begin(); it != cluster_indices.end(); ++it)
   {
-
-      //rgb = ((uint32_t)r << 16 | (uint32_t)g << 8 | (uint32_t)b);
-
       pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl_box (new pcl::PointCloud<pcl::PointXYZRGB>);
           for(pit = it->indices.begin(); pit != it->indices.end(); pit++)
           {
-          //push_back: add a point to the end of the existing vector
                   cloud_pcl_box->points.push_back(cloud_pcl_boxes->points[*pit]);
-
-                  //cluster_boxes->points.push_back(cloud_pcl_boxes->points[*pit]);
-                  //cluster_boxes->back().rgb=*reinterpret_cast<float*>(&rgb);
           }
 
           //Merge current clusters to whole point cloud
@@ -154,7 +131,7 @@ color_detection (nao_world_msgs::ObjectLocations::Request  &req,
 
   //Clustering Balls
   std::vector<pcl::PointIndices> cluster_indices_balls;
-  ec.setClusterTolerance (0.02); //0.01 kisten getrennt
+  ec.setClusterTolerance (0.02);
   ec.setMinClusterSize (30);
   ec.setMaxClusterSize (1000);
   ec.setSearchMethod (tree);
@@ -163,17 +140,13 @@ color_detection (nao_world_msgs::ObjectLocations::Request  &req,
 
 
   std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr > cluster_ball;
- // pcl::PointCloud<pcl::PointXYZRGB>::Ptr cluster_balls (new pcl::PointCloud<pcl::PointXYZRGB>);
 
   for(it = cluster_indices_balls.begin(); it != cluster_indices_balls.end(); ++it)
   {
 
-     // rgb = ((uint32_t)r << 16 | (uint32_t)g << 8 | (uint32_t)b);
-
       pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_pcl_ball (new pcl::PointCloud<pcl::PointXYZRGB>);
           for(pit = it->indices.begin(); pit != it->indices.end(); pit++)
           {
-          //push_back: add a point to the end of the existing vector
                   cloud_pcl_ball->points.push_back(cloud_pcl_balls->points[*pit]);
           }
 
@@ -209,7 +182,6 @@ color_detection (nao_world_msgs::ObjectLocations::Request  &req,
 
   std::vector<float> ball_x;
   std::vector<float> ball_z;
-  //std::cout<<"Balls"<<std::endl;
   for(j=0;cluster_ball.size()>j;j++)
   {
     all_x=0;
@@ -255,10 +227,15 @@ color_detection (nao_world_msgs::ObjectLocations::Request  &req,
     rate.sleep();
   }
   
-  std::cout << map_to_robot.getOrigin().getX() << " - " << map_to_robot.getOrigin().getY() << ", #boxes: " << x_loc_boxes.size() <<  ", #balls:" << x_loc_balls.size() << std::endl;
+  /*std::cout << "#boxes: " << x_loc_boxes.size()
+    <<  ", #balls:" << x_loc_balls.size()
+    << ", #pixel: " << cloud_pcl_hsv.size()
+    << ", #red_pixel: " << cloud_pcl_boxes->points.size()
+    << ", #green_pixel: " << cloud_pcl_balls->points.size()
+    << std::endl;*/
   
   // get transformations to boxes
-  double map_origin = 1.84; // TODO: set properly
+  double map_origin = 1.84;
   std::vector<nao_world_msgs::GridCoordinate> box_coordinates;
   for (int i=0; i<x_loc_boxes.size(); i++) {
     tf::Transform robot_to_box;
@@ -292,16 +269,14 @@ color_detection (nao_world_msgs::ObjectLocations::Request  &req,
     res.boxLocs.markers.push_back(boxGridMarker);*/
     
     
-    // calculate grid coordinate
-    //tf::Transform map_to_box;
-    //map_to_box = map_to_robot * robot_to_box;
+    // calculate grid coordinateS
     double delta_x = map_to_box.getOrigin().getX();
     double delta_y = map_to_box.getOrigin().getY();
     nao_world_msgs::GridCoordinate box;
     int x_coord = -floor(delta_x / cell_size);
     int y_coord = floor((delta_y + map_origin) / cell_size) + 1;
-    box.x = x_coord;
-    box.y = y_coord;
+    box.y = x_coord;
+    box.x = y_coord;
     box_coordinates.push_back(box);
     
     std::cout << "robot to: " << ss2.str() << ": [" << robot_to_box.getOrigin().getX() << ", " << robot_to_box.getOrigin().getY() << "], in cell: [" << x_coord << ", " << y_coord << "]\n";
@@ -369,7 +344,7 @@ color_detection (nao_world_msgs::ObjectLocations::Request  &req,
     double delta_x = map_to_ball.getOrigin().getX();
     double delta_y = map_to_ball.getOrigin().getY();
     nao_world_msgs::GridCoordinate ball;
-    int x_coord = floor(delta_x / cell_size);
+    int x_coord = -floor(delta_x / cell_size);
     int y_coord = floor((delta_y + map_origin) / cell_size) + 1;   
     ball.x = x_coord;
     ball.y = y_coord;

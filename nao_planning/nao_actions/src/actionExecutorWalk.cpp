@@ -22,10 +22,10 @@ namespace nao_actions
         goal.x_loc= str2num(x_pos.substr(0,x_pos.find("-")));
         goal.y_loc= str2num(x_pos.substr(x_pos.find("-")+1));*/
         
-      ros::NodeHandle nhPriv("~");
-      double cell_size;
-      nhPriv.getParam("cell_size", cell_size);
-      goal.distance = cell_size;
+        ros::NodeHandle nhPriv("~");
+        double cell_size;
+        nhPriv.getParam("cell_size", cell_size);
+        goal.distance = cell_size;
         
         // set corresponding WalkGoal parameters
         // i.e.: goal.<fieldName> = <value>;
@@ -44,16 +44,15 @@ namespace nao_actions
         string loc_from = a.parameters[1];
         string loc_to = a.parameters[2];
         string direction = a.parameters[3];
-       
+      
         if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
-		ROS_INFO("Walk succeeded.");
-		current.setBooleanPredicate("at", robot + " " + loc_from, false);
-		current.setBooleanPredicate("clear", loc_to, false);
-		current.setBooleanPredicate("at", robot + " " + loc_to, true);
-		current.setBooleanPredicate("clear", loc_from, true);
+		    ROS_INFO("Walk succeeded.");
+		    current.setBooleanPredicate("at", robot + " " + loc_from, false);
+		    //current.setBooleanPredicate("clear", loc_to, false);
+		    //current.setBooleanPredicate("at", robot + " " + loc_to, true);
+		    current.setBooleanPredicate("clear", loc_from, true);
 
-		/*ros::NodeHandle nhPriv("~");
-		nhPriv.setParam("robotLoc", loc_to);*/
+		    //SnhPriv.setParam("robotLoc", loc_to);
 		
        }
     }

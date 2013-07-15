@@ -1,12 +1,15 @@
 #include <nao_world_msgs/WalkAction.h>
 #include <actionlib/server/simple_action_server.h>
+#include "ros/ros.h"
 
 typedef actionlib::SimpleActionServer<nao_world_msgs::WalkAction> Server;
 
 void execute(const nao_world_msgs::WalkGoalConstPtr& goal, Server* as)
 {
   // Do lots of awesome groundbreaking robot stuff here
-  as->setSucceeded();
+  std::cout<<"\n\n\n\nWRONG SERVER\n\n\n\n\n";
+  ROS_INFO();
+  as->setSucceeded("\n\n\n\nWRONG SERVER\n\n\n\n\n");
 }
 
 int main(int argc, char** argv)

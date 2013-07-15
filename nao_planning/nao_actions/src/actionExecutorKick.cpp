@@ -47,9 +47,9 @@ namespace nao_actions
 	if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
 		ROS_INFO("Kick succeeded.");
 		current.setBooleanPredicate("at", ball + " " + loc_2, false);
-		current.setBooleanPredicate("at", ball + " " + loc_3, true);
+		//current.setBooleanPredicate("at", ball + " " + loc_3, true);
 		current.setBooleanPredicate("clear", loc_3, false);
-		current.setBooleanPredicate("clear", loc_2, true);
+		//current.setBooleanPredicate("clear", loc_2, true);
 
 		/*ros::NodeHandle nhPriv("~");
 		XmlRpc::XmlRpcValue ballLocs, balls;

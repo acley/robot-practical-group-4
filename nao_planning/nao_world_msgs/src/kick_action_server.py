@@ -8,13 +8,13 @@ from nao_world_msgs.msg import *
 
 class KickActionServer:
   def __init__(self):
-    self.server = actionlib.SimpleActionServer('/nao_world_msgs/KickActionServer', KickAction, self.execute, False)
+    self.server = actionlib.SimpleActionServer('/nao_world_msgs/kick_action_server', KickAction, self.execute, False)
     self.server.start()
     rospy.loginfo("Kick Action Server started.")
 
   def execute(self, goal):
     # Do lots of awesome groundbreaking robot stuff here
-    #self.kick()
+    self.kick()
     self.server.set_succeeded()
     
   def kick(self):
@@ -124,7 +124,7 @@ class KickActionServer:
 
     try:
       # uncomment the following line and modify the IP if you use this script outside Choregraphe.
-      motion = ALProxy("ALMotion", "192.168.105.14", 9559)
+      motion = ALProxy("ALMotion", "192.168.105.15", 9559)
       motion.stiffnessInterpolation("Body", 1.0, 0.1)
       #motion.walkInit()
       motion.angleInterpolation(names, keys, times, True);
@@ -132,6 +132,6 @@ class KickActionServer:
       print err
     
 if __name__ == '__main__':
-  rospy.init_node('KickActionServer')
+  rospy.init_node('kick_action_server')
   server = KickActionServer()
   rospy.spin()

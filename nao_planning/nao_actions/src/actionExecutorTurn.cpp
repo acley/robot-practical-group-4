@@ -56,7 +56,7 @@ namespace nao_actions
         if (actionReturnState == actionlib::SimpleClientGoalState::SUCCEEDED) {
 		ROS_INFO("Turn succeeded.");
 		current.setBooleanPredicate("Orientation", robot + " " + dir_from, false);
-		current.setBooleanPredicate("Orientation", robot + " " + dir_to, true);		
+		//current.setBooleanPredicate("Orientation", robot + " " + dir_to, true);		
 
 		/*ros::NodeHandle nhPriv("~");
 		nhPriv.setParam("robotDir", dir_to);*/

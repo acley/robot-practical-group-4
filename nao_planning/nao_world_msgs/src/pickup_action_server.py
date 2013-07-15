@@ -8,13 +8,13 @@ from nao_world_msgs.msg import *
 
 class PickupActionServer:
   def __init__(self):
-    self.server = actionlib.SimpleActionServer('/nao_world_msgs/PickupActionServer', PickupAction, self.execute, False)
+    self.server = actionlib.SimpleActionServer('/nao_world_msgs/pickup_action_server', PickupAction, self.execute, False)
     self.server.start()
     rospy.loginfo("Pickup Action Server started.")
 
   def execute(self, goal):
     # Do lots of awesome groundbreaking robot stuff here
-    #self.pickup()
+    self.pickup()
     self.server.set_succeeded()
     
   def pickup(self):
@@ -124,7 +124,7 @@ class PickupActionServer:
 
     try:
       # uncomment the following line and modify the IP if you use this script outside Choregraphe.
-      motion = ALProxy("ALMotion", "192.168.105.14", 9559)
+      motion = ALProxy("ALMotion", "192.168.105.15", 9559)
       motion.stiffnessInterpolation("Body", 1.0, 0.1)
       #motion.walkInit()
       motion.angleInterpolationBezier(names, times, keys);
@@ -132,6 +132,6 @@ class PickupActionServer:
       print err
     
 if __name__ == '__main__':
-  rospy.init_node('PickupActionServer')
+  rospy.init_node('pickup_action_server')
   server = PickupActionServer()
   rospy.spin()

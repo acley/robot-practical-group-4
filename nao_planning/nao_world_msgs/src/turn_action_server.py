@@ -12,13 +12,13 @@ from nao_world_msgs.msg import *
 
 class TurnActionServer:
   def __init__(self):
-    self.server = actionlib.SimpleActionServer('/nao_world_msgs/TurnActionServer', TurnAction, self.execute, False)
+    self.server = actionlib.SimpleActionServer('/nao_world_msgs/turn_action_server', TurnAction, self.execute, False)
     self.server.start()
     rospy.loginfo("Turn Action Server started.")
 
   def execute(self, goal):
     # Do lots of awesome groundbreaking robot stuff here
-    self.turn(goal.theta)
+    self.turn(goal)
     self.server.set_succeeded()
     
   def turn(self, goal):
@@ -30,7 +30,7 @@ class TurnActionServer:
         print "Error was: ", e
 
     # Set NAO in Stiffness On
-    StiffnessOn(motionProxy)
+    self.StiffnessOn(motionProxy)
 
     # Send NAO to Pose Init
     #motionProxy.walkInit()
@@ -101,7 +101,7 @@ class TurnActionServer:
     #~ motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", False]])
     motionProxy.setMotionConfig([["ENABLE_FOOT_CONTACT_PROTECTION", True]])
 
-    gait_config = [["MaxStepX", 0.04], ["MaxStepY", 0.14], ["MaxStepTheta", 0.35], ["MaxStepFrequency", 0.5], ["StepHeight", 0.019999999552965164], ["TorsoWx", 0.0], ["TorsoWy", -0.5]]
+    gait_config = [["MaxStepX", 0.04], ["MaxStepY", 0.14], ["MaxStepTheta", 0.35], ["MaxStepFrequency", 0.5], ["StepHeight", 0.019999999552965164]]#, ["TorsoWx", 0.0], ["TorsoWy", -0.5]]
 
     motionProxy.walkTo(0, 0, goal.theta, gait_config)
     
@@ -114,6 +114,6 @@ class TurnActionServer:
     proxy.setFallManagerEnabled(0)
     
 if __name__ == '__main__':
-  rospy.init_node('TurnActionServer')
+  rospy.init_node('turn_action_server')
   server = TurnActionServer()
   rospy.spin()
